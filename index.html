@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================================================================== -->
+<!--  ĐỔI TIÊU ĐỀ TRANG Ở ĐÂY (hiện trên tab trình duyệt)               -->
+<!-- ================================================================== -->
+<title>Chuyện Kể Bên Đèn</title>
+
+<!-- Bật JS-reveal (nếu tắt JS thì trang vẫn hiện đầy đủ) -->
+<script>document.documentElement.classList.add('js');</script>
+
+<!-- Fonts: Spectral (chữ tiêu đề, có dấu tiếng Việt) + Be Vietnam Pro (chữ thường) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:        #14171f;
+    --bg-deep:   #0f121a;
+    --surface:   #1a1e2b;
+    --surface-2: #20253550;
+    --border:    rgba(236,228,210,0.09);
+    --border-hi: rgba(233,176,74,0.45);
+    --rail:      rgba(233,176,74,0.20);
+    --lamp:      #e9b04a;
+    --lamp-soft: #f5d28a;
+    --text:      #ece4d2;
+    --text-dim:  #a39e8e;
+    --text-faint:#6f6c61;
+
+    --display: "Spectral", Georgia, serif;
+    --body: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
+
+    --maxw: 720px;
+    --rail-x: 26px;   /* khoảng cách của thanh dọc tới mép trái */
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{ margin:0; padding:0; }
+
+  body{
+    background:
+      radial-gradient(1200px 520px at 50% -180px, rgba(233,176,74,0.10), transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg) 60%, var(--bg-deep) 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  .wrap{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------------- HERO ---------------- */
+  .hero{
+    padding: 92px 0 56px;
+    text-align: center;
+    position: relative;
+  }
+  .hero__kicker{
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--lamp);
+    margin: 0 0 22px;
+    font-weight: 500;
+  }
+  .hero__title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 9vw, 68px);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--text);
+  }
+  .hero__lede{
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(17px, 3.4vw, 21px);
+    color: var(--text-dim);
+    max-width: 30ch;
+    margin: 20px auto 0;
+    line-height: 1.5;
+  }
+  .hero__meta{
+    margin-top: 30px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+  }
+  .hero__rule{
+    width: 1px; height: 46px;
+    margin: 30px auto 0;
+    background: linear-gradient(180deg, var(--rail), transparent);
+  }
+
+  /* ---------------- TIMELINE ---------------- */
+  .timeline{
+    list-style: none;
+    margin: 0 auto 40px;
+    padding: 8px 0 0;
+    position: relative;
+  }
+  /* thanh dọc xuyên suốt */
+  .timeline::before{
+    content:"";
+    position: absolute;
+    left: var(--rail-x);
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--rail) 6%, var(--rail) 94%, transparent);
+  }
+
+  .entry{
+    position: relative;
+    padding-left: 62px;
+    margin-bottom: 30px;
+  }
+
+  /* "ngọn đèn" trên thanh dọc */
+  .entry__node{
+    position: absolute;
+    left: calc(var(--rail-x) - 6px);
+    top: 26px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, var(--lamp-soft), var(--lamp) 60%, #8a6422 100%);
+    box-shadow: 0 0 0 5px rgba(233,176,74,0.10), 0 0 14px 2px rgba(233,176,74,0.35);
+    transition: box-shadow .35s ease, transform .35s ease;
+  }
+
+  .entry__card{
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px 24px;
+    transition: border-color .3s ease, transform .3s ease;
+  }
+  .entry:hover .entry__card{
+    border-color: var(--border-hi);
+    transform: translateY(-2px);
+  }
+  .entry:hover .entry__node{
+    transform: scale(1.18);
+    box-shadow: 0 0 0 6px rgba(233,176,74,0.16), 0 0 22px 4px rgba(233,176,74,0.55);
+  }
+
+  .entry__date{
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--lamp);
+    margin: 0 0 8px;
+    font-weight: 500;
+  }
+  .entry__title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(21px, 4.6vw, 26px);
+    line-height: 1.2;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+  .entry__blurb{
+    margin: 0 0 20px;
+    color: var(--text-dim);
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+
+  .entry__download{
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--bg-deep);
+    background: var(--lamp);
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 999px;
+    transition: background .25s ease, transform .15s ease, box-shadow .25s ease;
+  }
+  .entry__download:hover{
+    background: var(--lamp-soft);
+    box-shadow: 0 6px 18px -6px rgba(233,176,74,0.6);
+  }
+  .entry__download:active{ transform: translateY(1px); }
+  .entry__download svg{ width:15px; height:15px; }
+
+  /* ---------------- FOOTER ---------------- */
+  footer{
+    border-top: 1px solid var(--border);
+    padding: 34px 0 60px;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  footer a{ color: var(--text-dim); }
+
+  /* ---------------- Reveal khi cuộn (chỉ khi có JS) ---------------- */
+  .js .entry{
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .js .entry.is-visible{ opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce){
+    .js .entry{ opacity:1; transform:none; transition:none; }
+    .entry__card, .entry__node, .entry__download{ transition:none; }
+  }
+
+  /* visible focus cho bàn phím */
+  a:focus-visible{ outline: 2px solid var(--lamp-soft); outline-offset: 3px; border-radius: 6px; }
+
+  @media (max-width: 480px){
+    .hero{ padding: 70px 0 44px; }
+    :root{ --rail-x: 20px; }
+    .entry{ padding-left: 50px; }
+    .entry__card{ padding: 20px; }
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <!-- ============================================================== -->
+    <!--  PHẦN ĐẦU TRANG — đổi tên truyện & lời giới thiệu ở đây         -->
+    <!-- ============================================================== -->
+    <header class="hero">
+      <p class="hero__kicker">Tủ truyện · đọc &amp; tải về theo chương</p>
+      <h1 class="hero__title">Chuyện Kể Bên Đèn</h1>
+      <p class="hero__lede">Mỗi chương là một buổi tối. Tải về, pha ấm trà, và đọc thong thả.</p>
+      <p class="hero__meta">Cập nhật chương mới hằng tuần</p>
+      <div class="hero__rule" aria-hidden="true"></div>
+    </header>
+
+    <!-- ============================================================== -->
+    <!--  DANH SÁCH CHƯƠNG                                              -->
+    <!--                                                                -->
+    <!--  ➜ MỚI NHẤT để TRÊN CÙNG (hoặc dưới cùng, tuỳ bạn).            -->
+    <!--  ➜ Để thêm 1 chương: COPY nguyên khối <li>...</li> bên dưới,   -->
+    <!--    sửa ngày / tên / mô tả, và sửa đường dẫn file trong href.   -->
+    <!--  ➜ Nhớ bỏ file .docx vào thư mục  chapters/                     -->
+    <!-- ============================================================== -->
+    <ol class="timeline">
+
+      <!-- ===== KHỐI MẪU 1 CHƯƠNG (copy khối này để thêm) ===== -->
+      <li class="entry">
+        <span class="entry__node" aria-hidden="true"></span>
+        <div class="entry__card">
+          <p class="entry__date">11 · 06 · 2026</p>
+          <h2 class="entry__title">Chương 3 — Buổi sáng có mùi gỗ mới</h2>
+          <p class="entry__blurb">Ông dậy sớm hơn thường lệ. Trong xưởng, mùi bào gỗ thơm lựng,
+            và trên bàn là một thứ mà cô bé không ngờ tới.</p>
+          <a class="entry__download" href="chapters/chuong-03.docx" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Tải bản .docx
+          </a>
+        </div>
+      </li>
+      <!-- ===== HẾT KHỐI MẪU ===== -->
+
+      <li class="entry">
+        <span class="entry__node" aria-hidden="true"></span>
+        <div class="entry__card">
+          <p class="entry__date">04 · 06 · 2026</p>
+          <h2 class="entry__title">Chương 2 — Con Mực và cơn mưa đầu mùa</h2>
+          <p class="entry__blurb">Mưa gõ lên mái tôn suốt đêm. Con chó nằm cuộn dưới chân giường,
+            còn cô bé thì lần đầu thấy bà cười trong ánh chớp.</p>
+          <a class="entry__download" href="chapters/chuong-02.docx" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Tải bản .docx
+          </a>
+        </div>
+      </li>
+
+      <li class="entry">
+        <span class="entry__node" aria-hidden="true"></span>
+        <div class="entry__card">
+          <p class="entry__date">28 · 05 · 2026</p>
+          <h2 class="entry__title">Chương 1 — Ngôi nhà nhỏ cuối con dốc</h2>
+          <p class="entry__blurb">Câu chuyện bắt đầu từ một mái nhà có khói bếp, một ông lão làm mộc,
+            một bà cụ ít nói, và một đứa trẻ vừa được mang về.</p>
+          <a class="entry__download" href="chapters/chuong-01.docx" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Tải bản .docx
+          </a>
+        </div>
+      </li>
+
+    </ol>
+
+    <footer>
+      <p>Viết &amp; chia sẻ bởi tác giả · cảm ơn bạn đã ghé đọc.<br>
+      Trang được lưu trữ miễn phí trên GitHub Pages.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hiệu ứng hiện dần khi cuộn tới — thuần trang trí, không ảnh hưởng nội dung.
+    (function(){
+      var items = document.querySelectorAll('.entry');
+      if(!('IntersectionObserver' in window)){
+        items.forEach(function(el){ el.classList.add('is-visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(function(el){ io.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>
