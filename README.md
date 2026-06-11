@@ -1,12 +1,17 @@
-# Thư viện — đọc & tải truyện theo phần
+# Thư Viện Song Giới — đọc & tải truyện theo phần
 
-Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. Trang có:
+Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**, theo phong cách fantasy.
+Trang có:
 
-- **2 thư viện**: **OurEra** và **High and Higher**. Bấm vào tên thư viện để mở danh sách
-  các **phần** (Phần 1, Phần 2, Phần 3...), mỗi phần có nút tải file Word (.docx).
-- **Timeline**: bấm vào ô "Timeline" ở đầu trang để mở một hàng ngang thể hiện **thứ tự đọc
-  gợi ý** của tác giả (ví dụ: OurEra Phần 1 → High and Higher Phần 1 → OurEra Phần 2 → ...).
-  Bấm vào một bước sẽ mở đúng thư viện và cuộn tới phần đó.
+- **Trang đầu**: tiêu đề lớn "Thư Viện Song Giới" kèm slogan, ngăn cách bằng một vạch
+  trang trí (ornament).
+- **2 thư viện**: **OurEra** (kim sắc) và **High and Higher** (tử sắc), mỗi thư viện có
+  biểu tượng, dòng giới thiệu ngắn (tagline) riêng. Bấm vào để mở danh sách các **phần**
+  (Phần 1, Phần 2, Phần 3...), mỗi phần có nút tải file Word (.docx).
+- **Hành Trình Gợi Ý (Timeline)**: bấm vào ô này ở đầu trang để mở một hàng ngang thể hiện
+  **thứ tự đọc gợi ý** của tác giả (ví dụ: OurEra Phần 1 → High and Higher Phần 1 →
+  OurEra Phần 2 → ...), mỗi bước được tô màu theo thư viện. Bấm vào một bước sẽ mở đúng
+  thư viện và cuộn tới phần đó.
 
 ## Cấu trúc thư mục
 ```
@@ -55,9 +60,12 @@ Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. T
    `id` của phần (đã đặt ở mục 1), và sắp xếp các bước theo đúng thứ tự bạn muốn người đọc đi qua.
 
 ## Tuỳ chỉnh nhanh
-- **Tiêu đề trang ("Thư viện"):** sửa trong `<h1 class="hero__title">`.
-- **Tên 2 thư viện:** sửa trong `<h2 class="lib-card__title">`.
-- **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` (vd `--lamp` là màu vàng đèn).
+- **Tiêu đề & slogan đầu trang:** sửa `.hero__kicker`, `<h1 class="hero__title">` và
+  `.hero__lede`.
+- **Tên & dòng giới thiệu của 2 thư viện:** sửa `.lib-card__eyebrow`, `<h2 class="lib-card__title">`
+  và `.lib-card__tagline` trong từng `<details class="lib-card">`.
+- **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` — `--gold`/`--gold-soft` cho OurEra,
+  `--violet`/`--violet-soft` cho High and Higher.
 - **Tiêu đề tab trình duyệt:** sửa trong thẻ `<title>`.
 
 Không cần cài đặt gì cả — chỉ là một file HTML.
