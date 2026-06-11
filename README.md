@@ -60,6 +60,10 @@ Trang có:
    `id` của phần (đã đặt ở mục 1), và sắp xếp các bước theo đúng thứ tự bạn muốn người đọc đi qua.
 
 ## Tuỳ chỉnh nhanh
+- **Nền vũ trụ (cực quang, sao, bụi):** toàn bộ nằm trong `.cosmos` và `.cosmos::before` /
+  `.cosmos::after`. Độ sáng được giữ rất thấp (opacity nhỏ) để không làm mờ chữ — nếu muốn
+  rực rỡ hơn, tăng dần các giá trị `opacity` hoặc alpha trong `rgba(...)`, nhưng nên giữ
+  dưới `0.2` cho lớp cực quang để chữ vẫn rõ.
 - **Tiêu đề & slogan đầu trang:** sửa `.hero__kicker`, `<h1 class="hero__title">` và
   `.hero__lede`.
 - **Tên & dòng giới thiệu của 2 thư viện:** sửa `.lib-card__eyebrow`, `<h2 class="lib-card__title">`
