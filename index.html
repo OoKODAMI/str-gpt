@@ -7,7 +7,7 @@
 <!-- ================================================================== -->
 <!--  ĐỔI TIÊU ĐỀ TRANG Ở ĐÂY (hiện trên tab trình duyệt)               -->
 <!-- ================================================================== -->
-<title>Hai Thư Viện</title>
+<title>Thư viện</title>
 
 <!-- Bật JS-reveal (nếu tắt JS thì trang vẫn hiện đầy đủ) -->
 <script>document.documentElement.classList.add('js');</script>
@@ -36,11 +36,10 @@
     --body: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
 
     --maxw: 760px;
-    --rail-x: 26px;   /* khoảng cách của thanh dọc tới mép trái */
+    --rail-x: 26px;
   }
 
   *{ box-sizing:border-box; }
-
   html,body{ margin:0; padding:0; }
 
   body{
@@ -63,51 +62,27 @@
     padding: 0 24px;
   }
 
-  /* ---------------- HERO ---------------- */
+  /* ---------------- HERO (chỉ còn "Thư viện") ---------------- */
   .hero{
-    padding: 92px 0 56px;
+    padding: 72px 0 36px;
     text-align: center;
-    position: relative;
-  }
-  .hero__kicker{
-    font-size: 12px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--lamp);
-    margin: 0 0 22px;
-    font-weight: 500;
   }
   .hero__title{
     font-family: var(--display);
     font-weight: 600;
-    font-size: clamp(40px, 9vw, 68px);
-    line-height: 1.04;
+    font-size: clamp(34px, 7vw, 52px);
+    line-height: 1.05;
     letter-spacing: -0.01em;
     margin: 0;
     color: var(--text);
   }
-  .hero__lede{
-    font-family: var(--display);
-    font-style: italic;
-    font-size: clamp(17px, 3.4vw, 21px);
-    color: var(--text-dim);
-    max-width: 36ch;
-    margin: 20px auto 0;
-    line-height: 1.5;
-  }
-  .hero__meta{
-    margin-top: 30px;
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: var(--text-faint);
-  }
   .hero__rule{
-    width: 1px; height: 46px;
-    margin: 30px auto 0;
+    width: 1px; height: 40px;
+    margin: 26px auto 0;
     background: linear-gradient(180deg, var(--rail), transparent);
   }
 
-  /* ---------------- 2 THƯ VIỆN (TRANG CHỦ) ---------------- */
+  /* ---------------- 2 THƯ VIỆN (CHỈ TÊN) ---------------- */
   .lib-grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -115,39 +90,29 @@
     margin: 0 0 56px;
   }
   .lib-card{
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     text-decoration: none;
     color: var(--text);
     background: linear-gradient(180deg, var(--surface), var(--surface-2));
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 26px 22px;
+    padding: 28px 22px;
+    min-height: 110px;
     transition: border-color .3s ease, transform .3s ease;
   }
   .lib-card:hover{
     border-color: var(--border-hi);
     transform: translateY(-3px);
   }
-  .lib-card__kicker{
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--lamp);
-    margin: 0 0 10px;
-    font-weight: 500;
-  }
   .lib-card__title{
     font-family: var(--display);
     font-weight: 600;
-    font-size: clamp(20px, 4.6vw, 28px);
-    margin: 0 0 8px;
-    line-height: 1.2;
-  }
-  .lib-card__desc{
+    font-size: clamp(22px, 4.8vw, 30px);
     margin: 0;
-    color: var(--text-dim);
-    font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.2;
   }
 
   /* ---------------- TIÊU ĐỀ MỤC ---------------- */
@@ -163,30 +128,18 @@
     color: var(--text-dim);
     font-size: 14.5px;
   }
-  section.timeline-section,
-  section.library{
+  section.timeline-section{
     margin: 0 0 64px;
     scroll-margin-top: 24px;
   }
-  .library__back{
-    display: inline-block;
-    margin-bottom: 12px;
-    font-size: 12.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    text-decoration: none;
-  }
-  .library__back:hover{ color: var(--lamp); }
 
-  /* ---------------- TIMELINE TỔNG ---------------- */
+  /* ---------------- TIMELINE — DANH SÁCH BÌA (PHẦN TRUYỆN) ---------------- */
   .timeline{
     list-style: none;
     margin: 0 auto;
     padding: 8px 0 0;
     position: relative;
   }
-  /* thanh dọc xuyên suốt */
   .timeline::before{
     content:"";
     position: absolute;
@@ -200,7 +153,8 @@
   .entry{
     position: relative;
     padding-left: 62px;
-    margin-bottom: 18px;
+    margin-bottom: 22px;
+    scroll-margin-top: 24px;
   }
 
   /* "ngọn đèn" trên thanh dọc */
@@ -214,70 +168,23 @@
     box-shadow: 0 0 0 5px rgba(233,176,74,0.10), 0 0 14px 2px rgba(233,176,74,0.35);
     transition: box-shadow .35s ease, transform .35s ease;
   }
-
-  .entry__link{
-    display: block;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .entry__card{
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 22px;
-    transition: border-color .3s ease, transform .3s ease;
-  }
-  .entry:hover .entry__card{
-    border-color: var(--border-hi);
-    transform: translateY(-2px);
-  }
   .entry:hover .entry__node{
     transform: scale(1.18);
     box-shadow: 0 0 0 6px rgba(233,176,74,0.16), 0 0 22px 4px rgba(233,176,74,0.55);
   }
 
-  .entry__date{
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--lamp);
-    margin: 0 0 8px;
-    font-weight: 500;
-  }
-  .entry__path{
-    color: var(--text-faint);
-    text-transform: none;
-    letter-spacing: 0.02em;
-    font-weight: 400;
-  }
-  .entry__title{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(18px, 4.2vw, 22px);
-    line-height: 1.25;
-    margin: 0 0 6px;
-    color: var(--text);
-  }
-  .entry__blurb{
-    margin: 0;
-    color: var(--text-dim);
-    font-size: 14.5px;
-    line-height: 1.6;
-  }
-
-  /* ---------------- THƯ VIỆN: BỘ TRUYỆN / PHẦN / CHƯƠNG ---------------- */
-  details.series,
-  details.part{
+  /* ----- BÌA TRUYỆN (cover) ----- */
+  details.cover{
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
     border: 1px solid var(--border);
     border-radius: 14px;
-    margin-bottom: 14px;
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
     overflow: hidden;
+    transition: border-color .3s ease, transform .3s ease;
   }
-  details.part{
-    margin: 14px 0 0;
-    background: rgba(15,18,26,0.35);
+  details.cover[open]{ border-color: var(--border-hi); }
+  .entry:hover details.cover:not([open]){
+    border-color: var(--border-hi);
+    transform: translateY(-2px);
   }
 
   summary{
@@ -287,52 +194,52 @@
   }
   summary::-webkit-details-marker{ display:none; }
 
-  .series__summary,
-  .part__summary{
+  .cover__summary{
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 18px 22px;
+    gap: 14px;
+    padding: 20px 22px;
     transition: color .25s ease;
   }
-  .part__summary{ padding: 14px 18px; }
+  .cover__summary:hover{ color: var(--lamp); }
+  .cover__main{ flex: 1; min-width: 0; }
 
-  .series__summary:hover,
-  .part__summary:hover{ color: var(--lamp); }
-
-  .series__name{
+  .cover__lib{
+    font-size: 11.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--lamp);
+    margin: 0 0 6px;
+    font-weight: 500;
+  }
+  .cover__title{
     font-family: var(--display);
     font-weight: 600;
-    font-size: clamp(19px, 4.2vw, 24px);
+    font-size: clamp(20px, 4.4vw, 25px);
+    line-height: 1.22;
+    margin: 0 0 4px;
     color: var(--text);
   }
-  .part__name{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(16px, 3.6vw, 18px);
-    color: var(--text);
-  }
-  .series__summary:hover .series__name,
-  .part__summary:hover .part__name{ color: var(--lamp); }
-
-  .series__desc{
-    margin: -6px 22px 18px;
-    color: var(--text-dim);
-    font-size: 14px;
+  .cover__meta{
+    font-size: 13px;
+    color: var(--text-faint);
+    margin: 0;
   }
 
   .summary__chevron{
     flex: none;
-    width: 18px; height: 18px;
+    width: 20px; height: 20px;
     color: var(--text-faint);
     transition: transform .3s ease;
   }
   details[open] > summary .summary__chevron{ transform: rotate(90deg); }
 
-  .series__body{ padding: 0 22px 22px; }
-  .part__body{ padding: 0 18px 16px; }
-
+  /* ----- DANH SÁCH CHƯƠNG TRONG BÌA ----- */
+  .cover__body{
+    padding: 0 22px 22px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
   .chapters{
     list-style: none;
     margin: 0;
@@ -344,7 +251,7 @@
     border-radius: 10px;
     transition: background-color .4s ease, box-shadow .4s ease;
   }
-  .chapter:first-child{ border-top: none; }
+  .chapter:first-child{ border-top: none; padding-top: 18px; }
 
   .chapter__date{
     display: block;
@@ -391,10 +298,10 @@
   .entry__download:active{ transform: translateY(1px); }
   .entry__download svg{ width:15px; height:15px; }
 
-  /* Hiệu ứng "vừa nhảy tới" khi bấm từ Timeline */
-  .chapter.is-target{
-    background-color: rgba(233,176,74,0.07);
-    box-shadow: inset 3px 0 0 0 var(--lamp);
+  /* Hiệu ứng "vừa nhảy tới" khi bấm vào bìa từ thẻ thư viện */
+  .entry.is-target details.cover{
+    border-color: var(--lamp);
+    box-shadow: 0 0 0 1px var(--lamp), 0 10px 30px -10px rgba(233,176,74,0.45);
   }
 
   /* ---------------- FOOTER ---------------- */
@@ -418,10 +325,9 @@
 
   @media (prefers-reduced-motion: reduce){
     .js .entry{ opacity:1; transform:none; transition:none; }
-    .entry__card, .entry__node, .entry__download, .summary__chevron, .chapter{ transition:none; }
+    details.cover, .entry__node, .entry__download, .summary__chevron, .chapter{ transition:none; }
   }
 
-  /* visible focus cho bàn phím */
   a:focus-visible, summary:focus-visible{ outline: 2px solid var(--lamp-soft); outline-offset: 3px; border-radius: 6px; }
 
   @media (max-width: 560px){
@@ -429,12 +335,11 @@
   }
 
   @media (max-width: 480px){
-    .hero{ padding: 70px 0 44px; }
+    .hero{ padding: 56px 0 30px; }
     :root{ --rail-x: 20px; }
     .entry{ padding-left: 50px; }
-    .entry__card{ padding: 16px 18px; }
-    .series__body{ padding: 0 16px 16px; }
-    .series__desc{ margin: -6px 16px 14px; }
+    .cover__summary{ padding: 16px 18px; }
+    .cover__body{ padding: 0 18px 18px; }
   }
 </style>
 </head>
@@ -444,134 +349,61 @@
   <div class="wrap">
 
     <!-- ============================================================== -->
-    <!--  PHẦN ĐẦU TRANG — đổi tên & lời giới thiệu ở đây               -->
+    <!--  ĐẦU TRANG — chỉ còn "Thư viện"                                -->
     <!-- ============================================================== -->
     <header class="hero">
-      <p class="hero__kicker">Hai thư viện · vô số bộ truyện · đọc &amp; tải về theo chương</p>
-      <h1 class="hero__title">Hai Thư Viện</h1>
-      <p class="hero__lede">Một bên là Trái Đất — OurEra. Một bên là Mythren — High and Higher.</p>
-      <p class="hero__meta">Cập nhật chương mới hằng tháng</p>
+      <h1 class="hero__title">Thư viện</h1>
       <div class="hero__rule" aria-hidden="true"></div>
     </header>
 
     <!-- ============================================================== -->
-    <!--  TRANG CHỦ — 2 THƯ VIỆN                                        -->
-    <!--  ➜ Mỗi thẻ trỏ tới 1 mục <section class="library" id="..."> -->
-    <!--    bên dưới bằng href="#id".                                   -->
+    <!--  2 THƯ VIỆN (chỉ tên) — bấm để nhảy tới timeline tương ứng     -->
     <!-- ============================================================== -->
     <nav class="lib-grid" aria-label="Hai thư viện">
-      <a class="lib-card" href="#ourera">
-        <p class="lib-card__kicker">Trái Đất</p>
+      <a class="lib-card" href="#ourera-mau-p1">
         <h2 class="lib-card__title">OurEra</h2>
-        <p class="lib-card__desc">Thư viện những câu chuyện thuộc về thế giới của chúng ta.</p>
       </a>
-      <a class="lib-card" href="#mythren">
-        <p class="lib-card__kicker">Mythren</p>
+      <a class="lib-card" href="#mythren-mau-p1">
         <h2 class="lib-card__title">High and Higher</h2>
-        <p class="lib-card__desc">Thư viện những câu chuyện thuộc về thế giới Mythren.</p>
       </a>
     </nav>
 
     <!-- ============================================================== -->
-    <!--  TIMELINE TỔNG — bấm vào để nhảy thẳng đến chương              -->
+    <!--  TIMELINE — DANH SÁCH "BÌA TRUYỆN" (mỗi mục = 1 PHẦN)          -->
     <!--                                                                -->
-    <!--  ➜ Mỗi mục <li class="entry"> trỏ tới 1 chương bên dưới       -->
-    <!--    bằng href="#id-cua-chuong" (id đặt trên thẻ <li class="chapter">). -->
-    <!--  ➜ MỚI NHẤT để TRÊN CÙNG.                                      -->
+    <!--  ➜ Bấm vào 1 bìa: mở ra các chương bên trong.                  -->
+    <!--  ➜ Mỗi bìa là 1 <li class="entry"> với id="..." để 2 thẻ      -->
+    <!--    thư viện ở trên trỏ tới.                                    -->
+    <!--  ➜ Để thêm 1 BÌA mới: copy nguyên khối                         -->
+    <!--    "===== KHỐI MẪU 1 BÌA TRUYỆN =====", dán LÊN TRÊN CÙNG     -->
+    <!--    (bìa mới nhất ở trên).                                      -->
+    <!--  ➜ Để thêm 1 CHƯƠNG vào 1 bìa đã có: copy khối                 -->
+    <!--    "===== KHỐI MẪU 1 CHƯƠNG =====" trong bìa đó.              -->
+    <!--  ➜ Nhớ bỏ file .docx vào                                       -->
+    <!--    chapters/<thư-viện>/<bộ-truyện>/<phần>/                     -->
     <!-- ============================================================== -->
-    <section class="timeline-section" id="timeline">
-      <h2 class="section__title">Timeline</h2>
-      <p class="section__desc">Bấm vào một mục để đến thẳng chương đó trong thư viện tương ứng.</p>
-
+    <section class="timeline-section">
       <ol class="timeline">
 
-        <!-- ===== KHỐI MẪU 1 MỤC TIMELINE (copy khối này để thêm) ===== -->
-        <li class="entry">
+        <!-- ============================================================ -->
+        <!-- ===== KHỐI MẪU 1 BÌA TRUYỆN (copy để thêm bìa mới) ======= -->
+        <!-- ============================================================ -->
+        <li class="entry" id="ourera-mau-p1">
           <span class="entry__node" aria-hidden="true"></span>
-          <a class="entry__link" href="#ourera-mau-p1-c3">
-            <div class="entry__card">
-              <p class="entry__date">11 · 06 · 2026 <span class="entry__path">— OurEra · Bộ truyện mẫu · Phần 1</span></p>
-              <h3 class="entry__title">Chương 3 — Buổi sáng có mùi gỗ mới</h3>
-              <p class="entry__blurb">Ông dậy sớm hơn thường lệ. Trong xưởng, mùi bào gỗ thơm lựng,
-                và trên bàn là một thứ mà cô bé không ngờ tới.</p>
-            </div>
-          </a>
-        </li>
-        <!-- ===== HẾT KHỐI MẪU ===== -->
-
-        <li class="entry">
-          <span class="entry__node" aria-hidden="true"></span>
-          <a class="entry__link" href="#ourera-mau-p1-c2">
-            <div class="entry__card">
-              <p class="entry__date">04 · 06 · 2026 <span class="entry__path">— OurEra · Bộ truyện mẫu · Phần 1</span></p>
-              <h3 class="entry__title">Chương 2 — Con Mực và cơn mưa đầu mùa</h3>
-              <p class="entry__blurb">Mưa gõ lên mái tôn suốt đêm. Con chó nằm cuộn dưới chân giường,
-                còn cô bé thì lần đầu thấy bà cười trong ánh chớp.</p>
-            </div>
-          </a>
-        </li>
-
-        <li class="entry">
-          <span class="entry__node" aria-hidden="true"></span>
-          <a class="entry__link" href="#mythren-mau-p1-c1">
-            <div class="entry__card">
-              <p class="entry__date">28 · 05 · 2026 <span class="entry__path">— High and Higher · Bộ truyện mẫu · Phần 1</span></p>
-              <h3 class="entry__title">Chương 1 — Cánh cổng đầu tiên</h3>
-              <p class="entry__blurb">Ở Mythren, mọi cánh cửa đều dẫn đến một nơi cao hơn —
-                nhưng không phải ai cũng sẵn sàng để bước qua.</p>
-            </div>
-          </a>
-        </li>
-
-        <li class="entry">
-          <span class="entry__node" aria-hidden="true"></span>
-          <a class="entry__link" href="#ourera-mau-p1-c1">
-            <div class="entry__card">
-              <p class="entry__date">21 · 05 · 2026 <span class="entry__path">— OurEra · Bộ truyện mẫu · Phần 1</span></p>
-              <h3 class="entry__title">Chương 1 — Ngôi nhà nhỏ cuối con dốc</h3>
-              <p class="entry__blurb">Câu chuyện bắt đầu từ một mái nhà có khói bếp, một ông lão làm mộc,
-                một bà cụ ít nói, và một đứa trẻ vừa được mang về.</p>
-            </div>
-          </a>
-        </li>
-
-      </ol>
-    </section>
-
-    <!-- ============================================================== -->
-    <!--  THƯ VIỆN 1 — OURERA (TRÁI ĐẤT)                                -->
-    <!--                                                                -->
-    <!--  ➜ Mỗi <details class="series"> là 1 BỘ TRUYỆN.                -->
-    <!--  ➜ Trong bộ truyện, mỗi <details class="part"> là 1 PHẦN.      -->
-    <!--  ➜ Trong mỗi phần, mỗi <li class="chapter"> là 1 CHƯƠNG.        -->
-    <!--  ➜ id của <li class="chapter"> dùng để Timeline ở trên trỏ tới.-->
-    <!--  ➜ Nhớ bỏ file .docx vào  chapters/ourera/<bo-truyen>/<phan>/   -->
-    <!-- ============================================================== -->
-    <section class="library" id="ourera">
-      <a class="library__back" href="#timeline">↑ Về Timeline</a>
-      <h2 class="section__title">OurEra</h2>
-      <p class="section__desc">Thư viện những câu chuyện thuộc về Trái Đất.</p>
-
-      <!-- ===== KHỐI MẪU 1 BỘ TRUYỆN (copy khối này để thêm bộ truyện mới) ===== -->
-      <details class="series" open>
-        <summary class="series__summary">
-          <span class="series__name">Bộ truyện mẫu</span>
-          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-        </summary>
-        <p class="series__desc">Mô tả ngắn về bộ truyện này.</p>
-        <div class="series__body">
-
-          <!-- ===== KHỐI MẪU 1 PHẦN (copy khối này để thêm phần mới) ===== -->
-          <details class="part" open>
-            <summary class="part__summary">
-              <span class="part__name">Phần 1 — Tên phần</span>
+          <details class="cover">
+            <summary class="cover__summary">
+              <div class="cover__main">
+                <p class="cover__lib">OurEra</p>
+                <h3 class="cover__title">Bộ truyện mẫu — Phần 1</h3>
+                <p class="cover__meta">3 chương · cập nhật 11 · 06 · 2026</p>
+              </div>
               <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
             </summary>
-            <div class="part__body">
+            <div class="cover__body">
               <ol class="chapters">
 
-                <!-- ===== KHỐI MẪU 1 CHƯƠNG (copy khối này để thêm chương) ===== -->
-                <li class="chapter" id="ourera-mau-p1-c3">
+                <!-- ===== KHỐI MẪU 1 CHƯƠNG (copy để thêm chương) ===== -->
+                <li class="chapter">
                   <p class="chapter__date">11 · 06 · 2026</p>
                   <h4 class="chapter__title">Chương 3 — Buổi sáng có mùi gỗ mới</h4>
                   <p class="chapter__blurb">Ông dậy sớm hơn thường lệ. Trong xưởng, mùi bào gỗ thơm lựng,
@@ -583,7 +415,7 @@
                 </li>
                 <!-- ===== HẾT KHỐI MẪU CHƯƠNG ===== -->
 
-                <li class="chapter" id="ourera-mau-p1-c2">
+                <li class="chapter">
                   <p class="chapter__date">04 · 06 · 2026</p>
                   <h4 class="chapter__title">Chương 2 — Con Mực và cơn mưa đầu mùa</h4>
                   <p class="chapter__blurb">Mưa gõ lên mái tôn suốt đêm. Con chó nằm cuộn dưới chân giường,
@@ -594,7 +426,7 @@
                   </a>
                 </li>
 
-                <li class="chapter" id="ourera-mau-p1-c1">
+                <li class="chapter">
                   <p class="chapter__date">21 · 05 · 2026</p>
                   <h4 class="chapter__title">Chương 1 — Ngôi nhà nhỏ cuối con dốc</h4>
                   <p class="chapter__blurb">Câu chuyện bắt đầu từ một mái nhà có khói bếp, một ông lão làm mộc,
@@ -608,43 +440,24 @@
               </ol>
             </div>
           </details>
-          <!-- ===== HẾT KHỐI MẪU PHẦN ===== -->
+        </li>
+        <!-- ===== HẾT KHỐI MẪU BÌA TRUYỆN ===== -->
 
-        </div>
-      </details>
-      <!-- ===== HẾT KHỐI MẪU BỘ TRUYỆN ===== -->
-
-    </section>
-
-    <!-- ============================================================== -->
-    <!--  THƯ VIỆN 2 — HIGH AND HIGHER (MYTHREN)                        -->
-    <!--                                                                -->
-    <!--  Cấu trúc giống hệt thư viện OurEra ở trên:                    -->
-    <!--  bộ truyện (.series) → phần (.part) → chương (.chapter).        -->
-    <!--  ➜ Nhớ bỏ file .docx vào  chapters/mythren/<bo-truyen>/<phan>/  -->
-    <!-- ============================================================== -->
-    <section class="library" id="mythren">
-      <a class="library__back" href="#timeline">↑ Về Timeline</a>
-      <h2 class="section__title">High and Higher</h2>
-      <p class="section__desc">Thư viện những câu chuyện thuộc về thế giới Mythren.</p>
-
-      <details class="series" open>
-        <summary class="series__summary">
-          <span class="series__name">Bộ truyện mẫu</span>
-          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-        </summary>
-        <p class="series__desc">Mô tả ngắn về bộ truyện này.</p>
-        <div class="series__body">
-
-          <details class="part" open>
-            <summary class="part__summary">
-              <span class="part__name">Phần 1 — Tên phần</span>
+        <li class="entry" id="mythren-mau-p1">
+          <span class="entry__node" aria-hidden="true"></span>
+          <details class="cover">
+            <summary class="cover__summary">
+              <div class="cover__main">
+                <p class="cover__lib">High and Higher</p>
+                <h3 class="cover__title">Bộ truyện mẫu — Phần 1</h3>
+                <p class="cover__meta">1 chương · cập nhật 28 · 05 · 2026</p>
+              </div>
               <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
             </summary>
-            <div class="part__body">
+            <div class="cover__body">
               <ol class="chapters">
 
-                <li class="chapter" id="mythren-mau-p1-c1">
+                <li class="chapter">
                   <p class="chapter__date">28 · 05 · 2026</p>
                   <h4 class="chapter__title">Chương 1 — Cánh cổng đầu tiên</h4>
                   <p class="chapter__blurb">Ở Mythren, mọi cánh cửa đều dẫn đến một nơi cao hơn —
@@ -658,10 +471,9 @@
               </ol>
             </div>
           </details>
+        </li>
 
-        </div>
-      </details>
-
+      </ol>
     </section>
 
     <footer>
@@ -688,8 +500,7 @@
       items.forEach(function(el){ io.observe(el); });
     })();
 
-    // Bấm vào 1 mục Timeline -> mở các <details> chứa chương đó,
-    // cuộn tới chương và làm nổi bật trong giây lát.
+    // Bấm vào 1 thẻ thư viện -> mở bìa truyện tương ứng & cuộn tới.
     (function(){
       function revealTarget(){
         var hash = window.location.hash;
@@ -698,13 +509,10 @@
         try{ target = document.querySelector(hash); } catch(e){ return; }
         if(!target) return;
 
-        var node = target;
-        while(node){
-          if(node.tagName === 'DETAILS') node.open = true;
-          node = node.parentElement;
-        }
+        var d = target.querySelector('details.cover');
+        if(d) d.open = true;
 
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         target.classList.add('is-target');
         window.setTimeout(function(){ target.classList.remove('is-target'); }, 2200);
       }
