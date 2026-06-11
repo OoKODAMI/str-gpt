@@ -49,11 +49,7 @@
   html,body{ margin:0; padding:0; }
 
   body{
-    background:
-      radial-gradient(900px 460px at 18% -120px, rgba(233,176,74,0.12), transparent 60%),
-      radial-gradient(900px 460px at 88% 140px, rgba(155,140,255,0.10), transparent 62%),
-      linear-gradient(180deg, var(--bg) 0%, var(--bg) 55%, var(--bg-deep) 100%);
-    background-attachment: fixed;
+    background: var(--bg-deep);
     color: var(--text);
     font-family: var(--body);
     font-size: 16px;
@@ -63,7 +59,55 @@
     min-height: 100vh;
   }
 
+  /* ---------------- NỀN VŨ TRỤ: cực quang + sao + bụi ---------------- */
+  /* Cố định toàn màn hình, độ sáng thấp để không làm mờ chữ phía trên. */
+  .cosmos{
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      /* cực quang — rất nhạt, chỉ gợi sắc */
+      radial-gradient(1100px 620px at 12% -12%, rgba(120,235,200,0.08), transparent 60%),
+      radial-gradient(1000px 600px at 92% 6%, rgba(155,140,255,0.10), transparent 62%),
+      radial-gradient(900px 560px at 45% 105%, rgba(233,176,74,0.05), transparent 65%),
+      linear-gradient(180deg, #0d0f19 0%, #0a0c14 55%, #07080f 100%);
+  }
+  /* lớp sao nhỏ */
+  .cosmos::before{
+    content:"";
+    position: absolute;
+    inset: -50%;
+    background-image:
+      radial-gradient(1px 1px at 8% 22%,  rgba(255,255,255,.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 33% 68%, rgba(255,255,255,.40) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 58% 14%, rgba(255,255,255,.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 78% 48%, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 94% 82%, rgba(255,255,255,.45) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 24% 90%, rgba(255,255,255,.40) 50%, transparent 51%),
+      radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,.30) 50%, transparent 51%);
+    background-repeat: repeat;
+    background-size: 340px 340px;
+    opacity: .55;
+  }
+  /* lớp bụi vũ trụ — đốm mềm, rất nhạt */
+  .cosmos::after{
+    content:"";
+    position: absolute;
+    inset: -50%;
+    background-image:
+      radial-gradient(2.5px 2.5px at 18% 32%, rgba(245,210,138,.16), transparent 60%),
+      radial-gradient(3px 3px at 70% 78%, rgba(207,200,255,.13), transparent 60%),
+      radial-gradient(2px 2px at 46% 12%, rgba(245,210,138,.11), transparent 60%),
+      radial-gradient(2.5px 2.5px at 86% 46%, rgba(207,200,255,.11), transparent 60%),
+      radial-gradient(2px 2px at 6% 64%, rgba(255,255,255,.08), transparent 60%);
+    background-repeat: repeat;
+    background-size: 620px 620px;
+    opacity: .6;
+  }
+
   .wrap{
+    position: relative;
     max-width: var(--maxw);
     margin: 0 auto;
     padding: 0 24px;
@@ -442,6 +486,8 @@
 </head>
 
 <body>
+
+  <div class="cosmos" aria-hidden="true"></div>
 
   <div class="wrap">
 
