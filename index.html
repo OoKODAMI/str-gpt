@@ -582,7 +582,7 @@
     function build(){
       var maxR = Math.hypot(W, H) * 0.82;
       stars = [];
-      var count = Math.round((W*H)/2100);
+      var count = Math.round((W*H)/3200);
       for(var i=0;i<count;i++){
         var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
         var tint = Math.random();
@@ -667,12 +667,12 @@
       // tâm cố định. glow = 0 → sao ĐỨNG YÊN (đốm trắng, không đuôi, không trôi).
       // Kéo timeline đủ sâu → glow tăng → sao xoay nhanh dần, đuôi dài dần.
       var cx = W*0.5, cy = H*0.46;
-      if(glow > 0) rot += glow * 0.014;            // chỉ xoay khi thật sự có độ sâu
+      if(glow > 0) rot += glow * 0.0095;           // chỉ xoay khi thật sự có độ sâu
 
       var sp = Math.min(1.7, glow * 1.9);
       var spinning = sp > 0.04;
       var trail = sp;
-      var segs = 6;
+      var segs = 4;
 
       // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
       ctx.lineCap = 'round';
