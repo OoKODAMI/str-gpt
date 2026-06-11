@@ -558,8 +558,8 @@
   </div>
 
   <script>
-  /* Cường độ vũ trụ: 0 = đầu timeline (dịu) → 1 = cuối timeline (cosmic).
-     Được cập nhật khi cuộn timeline, được nền canvas đọc để biến đổi. */
+  /* Cường độ vũ trụ: 0 = đầu timeline (đứng yên) → 1 = cuối timeline (xoay nhanh).
+     Cập nhật khi cuộn timeline; nền canvas đọc để quyết định tốc độ xoay & đuôi sao. */
   var cosmicDepth = 0;
 
   /* ============ NỀN VŨ TRỤ TƯƠNG TÁC ============ */
@@ -571,46 +571,20 @@
     var glow = 0; // bản làm mượt của cosmicDepth
 
     var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 1.5);
-    var stars = [], dust = [], shooting = [], rot = 0;
-    var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, down:false };
-    var pointerActive = false;
-
-    // canvas phụ vẽ aurora — chỉ vẽ lại khi glow đổi đáng kể, đỡ tốn createRadialGradient mỗi frame
-    var auroraCanvas = document.createElement('canvas');
-    var actx = auroraCanvas.getContext('2d');
-    var auroraGlow = -1;
-
-    // sprite bụi vũ trụ (kim sắc / tím) vẽ sẵn 1 lần, dùng drawImage thay vì tạo gradient mỗi frame
-    var DUST_SPR = 128;
-    var dustSprites = { g: makeDustSprite('245,210,138'), v: makeDustSprite('200,195,255') };
-    function makeDustSprite(rgb){
-      var c = document.createElement('canvas');
-      c.width = c.height = DUST_SPR;
-      var dctx = c.getContext('2d');
-      var r = DUST_SPR/2;
-      var g = dctx.createRadialGradient(r,r,0,r,r,r);
-      g.addColorStop(0, 'rgba('+rgb+',1)');
-      g.addColorStop(1, 'rgba('+rgb+',0)');
-      dctx.fillStyle = g;
-      dctx.beginPath(); dctx.arc(r,r,r,0,Math.PI*2); dctx.fill();
-      return c;
-    }
+    var stars = [], rot = 0;
 
     function resize(){
       W = canvas.clientWidth = window.innerWidth;
       H = canvas.clientHeight = window.innerHeight;
       canvas.width = W * DPR; canvas.height = H * DPR;
       ctx.setTransform(DPR,0,0,DPR,0,0);
-      auroraCanvas.width = canvas.width; auroraCanvas.height = canvas.height;
-      actx.setTransform(DPR,0,0,DPR,0,0);
-      auroraGlow = -1;
       build();
     }
 
     function build(){
       var maxR = Math.hypot(W, H) * 0.82;
       stars = [];
-      var count = Math.round((W*H)/3500);
+      var count = Math.round((W*H)/2100);
       for(var i=0;i<count;i++){
         var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
         var tint = Math.random();
@@ -629,70 +603,45 @@
           tws: 0.6 + Math.random()*1.4
         });
       }
-      dust = [];
-      var dn = Math.round((W*H)/120000);
-      for(var j=0;j<dn;j++){
-        dust.push({
-          radius: Math.random()*maxR,
-          ang: Math.random()*Math.PI*2,
-          r: 28 + Math.random()*64,
-          hue: Math.random() < 0.5 ? 'g' : 'v',
-          a: 0.04 + Math.random()*0.05
-        });
-      }
     }
 
-
     // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ
-    // vẽ vào canvas phụ (actx), chỉ gọi lại khi glow đổi đáng kể
-    function drawAurora(actx){
-      actx.clearRect(0,0,W,H);
+    function drawAurora(){
       var ac = W*0.5, ay0 = H*0.46;
       // cực quang tím: chính, mạnh dần theo glow
       var v = 0.13 + glow*0.26;
-      var g1 = actx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
+      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
       g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
       g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
       g1.addColorStop(1, 'rgba(155,140,255,0)');
-      actx.fillStyle = g1; actx.fillRect(0,0,W,H);
+      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
 
       // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu
       var ax = W*0.82, ay = H*0.12;
       var gg = 0.10 * (1 - glow*0.45);
-      var g2 = actx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
+      var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
       g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');
       g2.addColorStop(0.45, 'rgba(233,176,74,'+(gg*0.35)+')');
       g2.addColorStop(1, 'rgba(233,176,74,0)');
-      actx.fillStyle = g2; actx.fillRect(0,0,W,H);
+      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
 
       // ngọc lục: nở rộ khi đi sâu
       var bx = W*0.18, by = H*0.9;
       var tl = 0.06 + glow*0.13;
-      var g3 = actx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
+      var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
       g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
       g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');
       g3.addColorStop(1, 'rgba(120,235,200,0)');
-      actx.fillStyle = g3; actx.fillRect(0,0,W,H);
+      ctx.fillStyle = g3; ctx.fillRect(0,0,W,H);
 
       // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình
       if(glow > 0.02){
-        var g4 = actx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
+        var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
         g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.10)+')');
         g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.03)+')');
         g4.addColorStop(1, 'rgba(190,120,235,0)');
-        actx.fillStyle = g4; actx.fillRect(0,0,W,H);
+        ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);
       }
-    }
-
-    function spawnShoot(px, py){
-      var ang = Math.PI*0.18 + (Math.random()-0.5)*0.5;
-      var sp = 9 + Math.random()*7;
-      shooting.push({
-        x: px, y: py,
-        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp,
-        life: 1, len: 80 + Math.random()*70,
-        hue: Math.random()<0.5?'g':'v'
-      });
     }
 
     var t = 0;
@@ -700,41 +649,22 @@
       t += 0.016;
       ctx.clearRect(0,0,W,H);
 
-      // làm mượt cường độ vũ trụ theo độ sâu timeline
-      glow += ((typeof cosmicDepth === 'number' ? cosmicDepth : 0) - glow) * 0.05;
+      // làm mượt cường độ vũ trụ theo độ sâu timeline, CHỐT về 0 khi rất nhỏ
+      var target = (typeof cosmicDepth === 'number' ? cosmicDepth : 0);
+      glow += (target - glow) * 0.06;
+      if(target === 0 && glow < 0.003) glow = 0;   // hết kéo → sao đứng yên hẳn
 
-      // con trỏ mượt dần
-      mouse.x += (mouse.tx - mouse.x)*0.06;
-      mouse.y += (mouse.ty - mouse.y)*0.06;
-      var mx = mouse.x*W, my = mouse.y*H;
+      drawAurora();
 
-      // chỉ vẽ lại aurora khi glow đổi đáng kể, còn lại dùng ảnh đã cache
-      if(Math.abs(glow - auroraGlow) > 0.01){
-        drawAurora(actx);
-        auroraGlow = glow;
-      }
-      ctx.drawImage(auroraCanvas, 0, 0, W, H);
-
-      // tâm xoay cố định (đứng yên), không theo con trỏ
+      // tâm cố định. glow = 0 → sao ĐỨNG YÊN (đốm trắng, không đuôi, không trôi).
+      // Kéo timeline đủ sâu → glow tăng → sao xoay nhanh dần, đuôi dài dần.
       var cx = W*0.5, cy = H*0.46;
-      var spinSpeed = reduce ? 0 : (0.0010 + glow*0.0022);
-      rot += spinSpeed;
+      if(glow > 0) rot += glow * 0.020;            // chỉ xoay khi thật sự có độ sâu
 
-      // độ dài vệt cung — dài & rực hơn khi đi sâu timeline
-      var trail = 0.36 + glow*0.7;
-      var segs = 4;
-
-      // quầng bụi vũ trụ (mờ, cũng quay quanh tâm) — dùng sprite có sẵn thay vì tạo gradient mỗi frame
-      for(var d=0; d<dust.length; d++){
-        var p = dust[d];
-        var pa = p.ang + rot*0.6;
-        var px = cx + Math.cos(pa)*p.radius;
-        var py = cy + Math.sin(pa)*p.radius;
-        var da = p.a * (1 + glow*1.1);
-        ctx.globalAlpha = da;
-        ctx.drawImage(dustSprites[p.hue], px-p.r, py-p.r, p.r*2, p.r*2);
-        ctx.globalAlpha = 1;
-      }
+      var sp = Math.min(1.7, glow * 1.9);
+      var spinning = sp > 0.04;
+      var trail = sp;
+      var segs = 12;
 
       // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
       ctx.lineCap = 'round';
@@ -744,28 +674,24 @@
         var tw = reduce ? 1 : (0.7 + 0.3*Math.sin(t*s.tws + s.tw));
         var bright = Math.min(1, s.base * tw * (1 + glow*0.5));
         var lw = s.w * (1 + glow*0.25);
-
-        // vị trí đầu sao + sáng lên khi gần con trỏ
         var hx = cx + Math.cos(ang)*s.radius;
         var hy = cy + Math.sin(ang)*s.radius;
-        var near = Math.max(0, 1 - Math.hypot(hx-mx, hy-my)/200);
-        near = near*near;
-        bright = Math.min(1, bright + near*0.9);
-        lw = lw * (1 + near*0.7);
 
-        // vệt cung mờ dần về đuôi
-        for(var seg=0; seg<segs; seg++){
-          var f0 = seg/segs;
-          var a1 = ang - trail*f0;
-          var a0 = ang - trail*((seg+1)/segs);
-          var taper = 1 - f0;
-          var alpha = bright * taper * taper;
-          if(alpha < 0.012) continue;
-          ctx.beginPath();
-          ctx.arc(cx, cy, s.radius, a0, a1);
-          ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
-          ctx.lineWidth = lw;
-          ctx.stroke();
+        // vệt cung mờ dần về đuôi — chỉ vẽ khi đang xoay (đứng yên thì bỏ, nhẹ hơn)
+        if(spinning){
+          for(var seg=0; seg<segs; seg++){
+            var f0 = seg/segs;
+            var a1 = ang - trail*f0;
+            var a0 = ang - trail*((seg+1)/segs);
+            var taper = 1 - f0;
+            var alpha = bright * taper * taper;
+            if(alpha < 0.012) continue;
+            ctx.beginPath();
+            ctx.arc(cx, cy, s.radius, a0, a1);
+            ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
+            ctx.lineWidth = lw;
+            ctx.stroke();
+          }
         }
 
         // đầu sao sáng
@@ -773,63 +699,19 @@
         ctx.arc(hx, hy, Math.max(0.6, lw*0.9), 0, Math.PI*2);
         ctx.fillStyle = 'rgba('+s.col+','+bright+')';
         ctx.fill();
-        if((s.w > 1.2 && bright > 0.4) || near > 0.15){
+        if(s.w > 1.3 && bright > 0.45){
           ctx.beginPath();
-          ctx.arc(hx, hy, lw*2.6 + near*7, 0, Math.PI*2);
-          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12 + near*0.2)+')';
+          ctx.arc(hx, hy, lw*2.6, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12)+')';
           ctx.fill();
         }
-      }
-
-      // sao băng
-      for(var k=shooting.length-1;k>=0;k--){
-        var st = shooting[k];
-        st.x += st.vx; st.y += st.vy; st.life -= 0.018;
-        if(st.life <= 0 || st.x>W+120 || st.y>H+120){ shooting.splice(k,1); continue; }
-        var tailx = st.x - st.vx*(st.len/Math.hypot(st.vx,st.vy));
-        var taily = st.y - st.vy*(st.len/Math.hypot(st.vx,st.vy));
-        var grad = ctx.createLinearGradient(st.x, st.y, tailx, taily);
-        var col = st.hue==='g' ? '245,210,138' : '207,200,255';
-        grad.addColorStop(0, 'rgba('+col+','+(0.9*st.life)+')');
-        grad.addColorStop(1, 'rgba('+col+',0)');
-        ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.lineCap='round';
-        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tailx, taily); ctx.stroke();
-        ctx.beginPath(); ctx.arc(st.x, st.y, 2.2, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba('+col+','+st.life+')'; ctx.fill();
       }
 
       requestAnimationFrame(frame);
     }
 
-    // tương tác
-    window.addEventListener('pointermove', function(e){
-      pointerActive = true;
-      mouse.tx = e.clientX / window.innerWidth;
-      mouse.ty = e.clientY / window.innerHeight;
-    }, { passive:true });
-
-    window.addEventListener('pointerdown', function(e){
-      spawnShoot(e.clientX, e.clientY);
-    }, { passive:true });
-
-    // thiết bị cảm ứng / không di chuột: tự trôi nhẹ
-    setInterval(function(){
-      if(!pointerActive && !reduce){
-        mouse.tx = 0.5 + Math.sin(t*0.3)*0.18;
-        mouse.ty = 0.5 + Math.cos(t*0.22)*0.14;
-      }
-    }, 60);
-
-    // sao băng tự nhiên — dày hơn khi đi sâu vào timeline
-    setInterval(function(){
-      if(!reduce && Math.random() < 0.35 + glow*0.5){
-        spawnShoot(Math.random()*W*0.5, Math.random()*H*0.3);
-      }
-    }, 4200 - glow*2400);
-
     window.addEventListener('resize', resize);
     resize();
-    mouse.x = mouse.tx; mouse.y = mouse.ty;
     requestAnimationFrame(frame);
   })();
 
@@ -878,8 +760,11 @@
       prev.disabled = row.scrollLeft <= 4;
       next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
       // tiến trình cuộn timeline → cường độ vũ trụ của nền
+      // dead zone 40% đầu, sau đó đường cong lũy thừa để sao chỉ xoay khi kéo đủ sâu
       var max = row.scrollWidth - row.clientWidth;
-      cosmicDepth = max > 8 ? Math.min(1, Math.max(0, row.scrollLeft / max)) : 0;
+      var raw = max > 8 ? Math.min(1, Math.max(0, row.scrollLeft / max)) : 0;
+      var remapped = raw < 0.40 ? 0 : Math.pow((raw - 0.40) / 0.60, 1.6);
+      cosmicDepth = remapped;
     }
     prev.addEventListener('click', function(){ row.scrollBy({ left:-step()*2, behavior:'smooth' }); });
     next.addEventListener('click', function(){ row.scrollBy({ left: step()*2, behavior:'smooth' }); });
