@@ -571,7 +571,7 @@
     var glow = 0; // bản làm mượt của cosmicDepth
 
     var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
-    var stars = [], dust = [], shooting = [];
+    var stars = [], dust = [], shooting = [], rot = 0;
     var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, down:false };
     var pointerActive = false;
 
@@ -584,46 +584,53 @@
     }
 
     function build(){
+      var maxR = Math.hypot(W, H) * 0.82;
       stars = [];
-      var count = Math.round((W*H)/5200);
+      var count = Math.round((W*H)/1500);
       for(var i=0;i<count;i++){
-        var depth = Math.random();           // 0 xa → 1 gần
+        var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
+        var tint = Math.random();
+        var col = '255,255,255';
+        if(tint > 0.93) col = '245,210,138';        // đốm kim sắc
+        else if(tint > 0.85) col = '210,200,255';    // đốm tím
+        else if(tint > 0.74) col = '175,222,255';    // trắng xanh
         stars.push({
-          x: Math.random()*W,
-          y: Math.random()*H,
-          z: depth,
-          r: 0.4 + depth*1.7,
-          base: 0.18 + Math.random()*0.55,
+          radius: radius,
+          ang: Math.random()*Math.PI*2,
+          w: 0.5 + Math.random()*1.5,
+          base: 0.3 + Math.random()*0.6,
+          col: col,
+          spin: 1 + (Math.random()-0.5)*0.10,        // biến thiên nhẹ cho tự nhiên
           tw: Math.random()*Math.PI*2,
-          tws: 0.6 + Math.random()*1.6
+          tws: 0.6 + Math.random()*1.4
         });
       }
       dust = [];
-      var dn = Math.round((W*H)/42000);
+      var dn = Math.round((W*H)/60000);
       for(var j=0;j<dn;j++){
         dust.push({
-          x: Math.random()*W, y: Math.random()*H,
-          z: 0.3 + Math.random()*0.7,
-          r: 1.4 + Math.random()*2.6,
+          radius: Math.random()*maxR,
+          ang: Math.random()*Math.PI*2,
+          r: 28 + Math.random()*64,
           hue: Math.random() < 0.5 ? 'g' : 'v',
-          a: 0.06 + Math.random()*0.10
+          a: 0.04 + Math.random()*0.05
         });
       }
     }
 
-    // aurora đi theo con trỏ — rực rỡ dần theo độ sâu timeline (glow)
-    function drawAurora(mx, my){
+    // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ
+    function drawAurora(){
+      var ac = W*0.5, ay0 = H*0.46;
       // cực quang tím: chính, mạnh dần theo glow
       var v = 0.13 + glow*0.26;
-      var g1 = ctx.createRadialGradient(mx, my-40, 0, mx, my-40, Math.max(W,H)*(0.55+glow*0.2));
+      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
       g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
       g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
       g1.addColorStop(1, 'rgba(155,140,255,0)');
       ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
 
       // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu
-      var ax = W*0.82 - (mx - W/2)*0.15;
-      var ay = H*0.12 - (my - H/2)*0.15;
+      var ax = W*0.82, ay = H*0.12;
       var gg = 0.10 * (1 - glow*0.45);
       var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
       g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');
@@ -632,8 +639,7 @@
       ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
 
       // ngọc lục: nở rộ khi đi sâu
-      var bx = W*0.18 + (mx - W/2)*0.12;
-      var by = H*0.9 + (my - H/2)*0.12;
+      var bx = W*0.18, by = H*0.9;
       var tl = 0.06 + glow*0.13;
       var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
       g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
@@ -675,49 +681,73 @@
       mouse.y += (mouse.ty - mouse.y)*0.06;
       var mx = mouse.x*W, my = mouse.y*H;
 
-      drawAurora(mx, my);
+      drawAurora();
 
-      // parallax theo lệch chuột so với tâm
-      var ox = (mouse.x - 0.5);
-      var oy = (mouse.y - 0.5);
+      // tâm xoay cố định (đứng yên), không theo con trỏ
+      var cx = W*0.5, cy = H*0.46;
+      var spinSpeed = reduce ? 0 : (0.0010 + glow*0.0022);
+      rot += spinSpeed;
 
-      // bụi vũ trụ
+      // độ dài vệt cung — dài & rực hơn khi đi sâu timeline
+      var trail = 0.36 + glow*0.7;
+      var segs = 9;
+
+      // quầng bụi vũ trụ (mờ, cũng quay quanh tâm)
       for(var d=0; d<dust.length; d++){
         var p = dust[d];
-        var px = p.x - ox*70*p.z;
-        var py = p.y - oy*70*p.z;
-        var da = p.a * (1 + glow*0.9);
-        ctx.beginPath();
-        ctx.arc(px, py, p.r * (1 + glow*0.4), 0, Math.PI*2);
-        ctx.fillStyle = p.hue==='g'
-          ? 'rgba(245,210,138,'+da+')'
-          : 'rgba(207,200,255,'+da+')';
-        ctx.fill();
+        var pa = p.ang + rot*0.6;
+        var px = cx + Math.cos(pa)*p.radius;
+        var py = cy + Math.sin(pa)*p.radius;
+        var da = p.a * (1 + glow*1.1);
+        var dg = ctx.createRadialGradient(px,py,0,px,py,p.r);
+        var dc = p.hue==='g' ? '245,210,138' : '200,195,255';
+        dg.addColorStop(0,'rgba('+dc+','+da+')');
+        dg.addColorStop(1,'rgba('+dc+',0)');
+        ctx.fillStyle = dg;
+        ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2); ctx.fill();
       }
 
-      // sao
+      // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
+      ctx.lineCap = 'round';
       for(var i=0;i<stars.length;i++){
         var s = stars[i];
-        var sx = s.x - ox*120*s.z;
-        var sy = s.y - oy*120*s.z;
-        var tw = reduce ? 1 : (0.6 + 0.4*Math.sin(t*s.tws*(1+glow*0.6) + s.tw));
-        var a = s.base * tw * (1 + glow*0.5);
+        var ang = s.ang + rot * s.spin;
+        var tw = reduce ? 1 : (0.7 + 0.3*Math.sin(t*s.tws + s.tw));
+        var bright = Math.min(1, s.base * tw * (1 + glow*0.5));
+        var lw = s.w * (1 + glow*0.25);
 
-        // sao gần con trỏ sáng & to hơn
-        var dx = sx - mx, dy = sy - my;
-        var dist = Math.sqrt(dx*dx + dy*dy);
-        var near = Math.max(0, 1 - dist/160);
-        var r = s.r * (1 + near*1.6 + glow*0.5);
-        a = Math.min(1, a + near*0.5);
+        // vị trí đầu sao + sáng lên khi gần con trỏ
+        var hx = cx + Math.cos(ang)*s.radius;
+        var hy = cy + Math.sin(ang)*s.radius;
+        var near = Math.max(0, 1 - Math.hypot(hx-mx, hy-my)/200);
+        near = near*near;
+        bright = Math.min(1, bright + near*0.9);
+        lw = lw * (1 + near*0.7);
 
-        ctx.beginPath();
-        ctx.arc(sx, sy, r, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(255,255,255,'+a+')';
-        ctx.fill();
-        if(near > 0.15){
+        // vệt cung mờ dần về đuôi
+        for(var seg=0; seg<segs; seg++){
+          var f0 = seg/segs;
+          var a1 = ang - trail*f0;
+          var a0 = ang - trail*((seg+1)/segs);
+          var taper = 1 - f0;
+          var alpha = bright * taper * taper;
+          if(alpha < 0.012) continue;
           ctx.beginPath();
-          ctx.arc(sx, sy, r*3.2, 0, Math.PI*2);
-          ctx.fillStyle = 'rgba(245,225,180,'+(near*0.10)+')';
+          ctx.arc(cx, cy, s.radius, a0, a1);
+          ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
+          ctx.lineWidth = lw;
+          ctx.stroke();
+        }
+
+        // đầu sao sáng
+        ctx.beginPath();
+        ctx.arc(hx, hy, Math.max(0.6, lw*0.9), 0, Math.PI*2);
+        ctx.fillStyle = 'rgba('+s.col+','+bright+')';
+        ctx.fill();
+        if((s.w > 1.2 && bright > 0.4) || near > 0.15){
+          ctx.beginPath();
+          ctx.arc(hx, hy, lw*2.6 + near*7, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12 + near*0.2)+')';
           ctx.fill();
         }
       }
