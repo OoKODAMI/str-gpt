@@ -570,23 +570,47 @@
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var glow = 0; // bản làm mượt của cosmicDepth
 
-    var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 1.5);
     var stars = [], dust = [], shooting = [], rot = 0;
     var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, down:false };
     var pointerActive = false;
+
+    // canvas phụ vẽ aurora — chỉ vẽ lại khi glow đổi đáng kể, đỡ tốn createRadialGradient mỗi frame
+    var auroraCanvas = document.createElement('canvas');
+    var actx = auroraCanvas.getContext('2d');
+    var auroraGlow = -1;
+
+    // sprite bụi vũ trụ (kim sắc / tím) vẽ sẵn 1 lần, dùng drawImage thay vì tạo gradient mỗi frame
+    var DUST_SPR = 128;
+    var dustSprites = { g: makeDustSprite('245,210,138'), v: makeDustSprite('200,195,255') };
+    function makeDustSprite(rgb){
+      var c = document.createElement('canvas');
+      c.width = c.height = DUST_SPR;
+      var dctx = c.getContext('2d');
+      var r = DUST_SPR/2;
+      var g = dctx.createRadialGradient(r,r,0,r,r,r);
+      g.addColorStop(0, 'rgba('+rgb+',1)');
+      g.addColorStop(1, 'rgba('+rgb+',0)');
+      dctx.fillStyle = g;
+      dctx.beginPath(); dctx.arc(r,r,r,0,Math.PI*2); dctx.fill();
+      return c;
+    }
 
     function resize(){
       W = canvas.clientWidth = window.innerWidth;
       H = canvas.clientHeight = window.innerHeight;
       canvas.width = W * DPR; canvas.height = H * DPR;
       ctx.setTransform(DPR,0,0,DPR,0,0);
+      auroraCanvas.width = canvas.width; auroraCanvas.height = canvas.height;
+      actx.setTransform(DPR,0,0,DPR,0,0);
+      auroraGlow = -1;
       build();
     }
 
     function build(){
       var maxR = Math.hypot(W, H) * 0.82;
       stars = [];
-      var count = Math.round((W*H)/1500);
+      var count = Math.round((W*H)/3500);
       for(var i=0;i<count;i++){
         var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
         var tint = Math.random();
@@ -606,7 +630,7 @@
         });
       }
       dust = [];
-      var dn = Math.round((W*H)/60000);
+      var dn = Math.round((W*H)/120000);
       for(var j=0;j<dn;j++){
         dust.push({
           radius: Math.random()*maxR,
@@ -618,42 +642,45 @@
       }
     }
 
+
     // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ
-    function drawAurora(){
+    // vẽ vào canvas phụ (actx), chỉ gọi lại khi glow đổi đáng kể
+    function drawAurora(actx){
+      actx.clearRect(0,0,W,H);
       var ac = W*0.5, ay0 = H*0.46;
       // cực quang tím: chính, mạnh dần theo glow
       var v = 0.13 + glow*0.26;
-      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
+      var g1 = actx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
       g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
       g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
       g1.addColorStop(1, 'rgba(155,140,255,0)');
-      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+      actx.fillStyle = g1; actx.fillRect(0,0,W,H);
 
       // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu
       var ax = W*0.82, ay = H*0.12;
       var gg = 0.10 * (1 - glow*0.45);
-      var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
+      var g2 = actx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
       g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');
       g2.addColorStop(0.45, 'rgba(233,176,74,'+(gg*0.35)+')');
       g2.addColorStop(1, 'rgba(233,176,74,0)');
-      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+      actx.fillStyle = g2; actx.fillRect(0,0,W,H);
 
       // ngọc lục: nở rộ khi đi sâu
       var bx = W*0.18, by = H*0.9;
       var tl = 0.06 + glow*0.13;
-      var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
+      var g3 = actx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
       g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
       g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');
       g3.addColorStop(1, 'rgba(120,235,200,0)');
-      ctx.fillStyle = g3; ctx.fillRect(0,0,W,H);
+      actx.fillStyle = g3; actx.fillRect(0,0,W,H);
 
       // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình
       if(glow > 0.02){
-        var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
+        var g4 = actx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
         g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.10)+')');
         g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.03)+')');
         g4.addColorStop(1, 'rgba(190,120,235,0)');
-        ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);
+        actx.fillStyle = g4; actx.fillRect(0,0,W,H);
       }
     }
 
@@ -681,7 +708,12 @@
       mouse.y += (mouse.ty - mouse.y)*0.06;
       var mx = mouse.x*W, my = mouse.y*H;
 
-      drawAurora();
+      // chỉ vẽ lại aurora khi glow đổi đáng kể, còn lại dùng ảnh đã cache
+      if(Math.abs(glow - auroraGlow) > 0.01){
+        drawAurora(actx);
+        auroraGlow = glow;
+      }
+      ctx.drawImage(auroraCanvas, 0, 0, W, H);
 
       // tâm xoay cố định (đứng yên), không theo con trỏ
       var cx = W*0.5, cy = H*0.46;
@@ -690,21 +722,18 @@
 
       // độ dài vệt cung — dài & rực hơn khi đi sâu timeline
       var trail = 0.36 + glow*0.7;
-      var segs = 9;
+      var segs = 4;
 
-      // quầng bụi vũ trụ (mờ, cũng quay quanh tâm)
+      // quầng bụi vũ trụ (mờ, cũng quay quanh tâm) — dùng sprite có sẵn thay vì tạo gradient mỗi frame
       for(var d=0; d<dust.length; d++){
         var p = dust[d];
         var pa = p.ang + rot*0.6;
         var px = cx + Math.cos(pa)*p.radius;
         var py = cy + Math.sin(pa)*p.radius;
         var da = p.a * (1 + glow*1.1);
-        var dg = ctx.createRadialGradient(px,py,0,px,py,p.r);
-        var dc = p.hue==='g' ? '245,210,138' : '200,195,255';
-        dg.addColorStop(0,'rgba('+dc+','+da+')');
-        dg.addColorStop(1,'rgba('+dc+',0)');
-        ctx.fillStyle = dg;
-        ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha = da;
+        ctx.drawImage(dustSprites[p.hue], px-p.r, py-p.r, p.r*2, p.r*2);
+        ctx.globalAlpha = 1;
       }
 
       // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
