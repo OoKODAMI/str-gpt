@@ -64,12 +64,13 @@ Trang có:
   `.cosmos::after`. Độ sáng được giữ rất thấp (opacity nhỏ) để không làm mờ chữ — nếu muốn
   rực rỡ hơn, tăng dần các giá trị `opacity` hoặc alpha trong `rgba(...)`, nhưng nên giữ
   dưới `0.2` cho lớp cực quang để chữ vẫn rõ.
-- **Tiêu đề & slogan đầu trang:** sửa `.hero__kicker`, `<h1 class="hero__title">` và
-  `.hero__lede`.
-- **Tên & dòng giới thiệu của 2 thư viện:** sửa `.lib-card__eyebrow`, `<h2 class="lib-card__title">`
+- **Tiêu đề đầu trang:** sửa `.hero__kicker` và `<h1 class="hero__title">`.
+- **Tên & dòng giới thiệu của 2 thư viện:** sửa `<h2 class="lib-card__title">`
   và `.lib-card__tagline` trong từng `<details class="lib-card">`.
 - **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` — `--gold`/`--gold-soft` cho OurEra,
   `--violet`/`--violet-soft` cho High and Higher.
+- **Font chữ:** toàn bộ trang dùng Times New Roman, khai báo trong các biến
+  `--display`/`--serif`/`--body` ở `:root{ ... }`.
 - **Tiêu đề tab trình duyệt:** sửa trong thẻ `<title>`.
 
 Không cần cài đặt gì cả — chỉ là một file HTML.
