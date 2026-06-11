@@ -3,41 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- ================================================================== -->
-<!--  ĐỔI TIÊU ĐỀ TRANG Ở ĐÂY (hiện trên tab trình duyệt)               -->
-<!-- ================================================================== -->
-<title>Thư Viện</title>
-
-<!-- Bật JS-reveal (nếu tắt JS thì trang vẫn hiện đầy đủ) -->
+<title>Thư Viện — OurEra &amp; High and Higher</title>
 <script>document.documentElement.classList.add('js');</script>
-
 <style>
   :root{
-    --bg:        #12141d;
-    --bg-deep:   #0c0e16;
-    --surface:   #1b1f2e;
-    --surface-2: #20253a40;
-    --border:    rgba(236,228,210,0.09);
-    --border-hi: rgba(233,176,74,0.45);
+    --bg-deep:   #07080f;
+    --surface:   #14171f;
+    --surface-2: #1a1e2c40;
+    --border:    rgba(236,228,210,0.10);
+    --border-hi: rgba(233,176,74,0.42);
 
-    /* OurEra — kim sắc / mặt trời */
+    /* OurEra — kim sắc */
     --gold:      #e9b04a;
-    --gold-soft: #f5d28a;
+    --gold-soft: #f6d79a;
 
-    /* High and Higher — tử sắc / thiên giới */
+    /* High and Higher — tử sắc */
     --violet:      #9b8cff;
-    --violet-soft: #cfc8ff;
+    --violet-soft: #d3ccff;
 
-    --text:      #ece4d2;
-    --text-dim:  #a39e8e;
-    --text-faint:#6f6c61;
+    --text:      #efe8d8;
+    --text-dim:  #a8a292;
+    --text-faint:#726f63;
 
-    --display: "Times New Roman", Times, serif;
-    --serif:   "Times New Roman", Times, serif;
+    --display: "Times New Roman", Times, "Liberation Serif", serif;
     --body:    "Times New Roman", Times, serif;
 
-    --maxw: 920px;
+    --maxw: 800px;
   }
 
   *{ box-sizing:border-box; }
@@ -47,177 +38,146 @@
     background: var(--bg-deep);
     color: var(--text);
     font-family: var(--body);
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 1.62;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
   }
 
-  /* ---------------- NỀN VŨ TRỤ: cực quang + sao + bụi ---------------- */
-  /* Cố định toàn màn hình, độ sáng thấp để không làm mờ chữ phía trên. */
-  .cosmos{
+  /* canvas nền tương tác */
+  #cosmos{
     position: fixed;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
     z-index: -2;
-    overflow: hidden;
     pointer-events: none;
-    transform: translateZ(0);
-    will-change: transform;
-    background:
-      /* cực quang — rất nhạt, chỉ gợi sắc */
-      radial-gradient(1100px 620px at 12% -12%, rgba(120,235,200,0.08), transparent 60%),
-      radial-gradient(1000px 600px at 92% 6%, rgba(155,140,255,0.10), transparent 62%),
-      radial-gradient(900px 560px at 45% 105%, rgba(233,176,74,0.05), transparent 65%),
-      linear-gradient(180deg, #0d0f19 0%, #0a0c14 55%, #07080f 100%);
+    display: block;
   }
-  /* lớp sao + bụi — gộp 1 lớp duy nhất để đỡ nặng */
-  .cosmos::before{
-    content:"";
-    position: absolute;
+  /* lớp phủ tối nhẹ để chữ luôn rõ */
+  .veil{
+    position: fixed;
     inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 8% 22%,  rgba(255,255,255,.55) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 58% 14%, rgba(255,255,255,.55) 50%, transparent 51%),
-      radial-gradient(1px 1px at 78% 48%, rgba(255,255,255,.35) 50%, transparent 51%),
-      radial-gradient(1px 1px at 94% 82%, rgba(255,255,255,.45) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 24% 90%, rgba(255,255,255,.40) 50%, transparent 51%),
-      radial-gradient(2.5px 2.5px at 18% 32%, rgba(245,210,138,.16), transparent 60%),
-      radial-gradient(3px 3px at 70% 78%, rgba(207,200,255,.13), transparent 60%),
-      radial-gradient(2.5px 2.5px at 46% 60%, rgba(207,200,255,.11), transparent 60%);
-    background-repeat: repeat;
-    background-size: 480px 480px;
-    opacity: .55;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 0%, transparent 40%, rgba(7,8,15,0.55) 100%);
   }
 
   .wrap{
     position: relative;
     max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 26px;
   }
 
   /* ---------------- HERO ---------------- */
   .hero{
-    padding: 88px 0 40px;
+    padding: 108px 0 44px;
     text-align: center;
   }
   .hero__kicker{
-    font-family: var(--display);
-    font-size: 12px;
-    letter-spacing: 0.42em;
+    font-size: 13px;
+    letter-spacing: 0.46em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin: 0 0 18px;
-    font-weight: 600;
+    margin: 0 0 22px;
+    font-style: italic;
   }
-  .hero__kicker span{ color: var(--gold); }
-  .hero__kicker em{
-    font-style: normal;
-    color: var(--violet);
-  }
+  .hero__kicker span{ color: var(--gold); font-style: normal; }
+  .hero__kicker em{ font-style: normal; color: var(--violet); }
   .hero__title{
     font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(38px, 8vw, 60px);
-    line-height: 1.12;
-    letter-spacing: 0.04em;
+    font-weight: 700;
+    font-size: clamp(54px, 13vw, 104px);
+    line-height: 1.02;
+    letter-spacing: 0.02em;
     margin: 0;
     color: var(--text);
-    text-shadow: 0 0 28px rgba(233,176,74,0.18);
+    text-shadow: 0 0 40px rgba(233,176,74,0.20), 0 0 80px rgba(155,140,255,0.12);
   }
 
-  /* Vạch trang trí: hai đường + 1 viên kim cương ở giữa */
   .ornament{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 14px;
-    margin: 34px auto 0;
-    max-width: 260px;
+    gap: 16px;
+    margin: 38px auto 0;
+    max-width: 280px;
   }
   .ornament__line{
-    flex: 1;
-    height: 1px;
+    flex: 1; height: 1px;
     background: linear-gradient(90deg, transparent, var(--border-hi));
   }
-  .ornament__line--right{
-    background: linear-gradient(90deg, var(--border-hi), transparent);
-  }
+  .ornament__line--right{ background: linear-gradient(90deg, var(--border-hi), transparent); }
   .ornament__gem{
-    width: 8px; height: 8px;
-    flex: none;
+    width: 9px; height: 9px; flex: none;
     background: linear-gradient(135deg, var(--gold), var(--violet));
     transform: rotate(45deg);
     border-radius: 2px;
-    box-shadow: 0 0 12px rgba(233,176,74,0.35);
+    box-shadow: 0 0 14px rgba(233,176,74,0.4);
   }
 
-  summary{
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
-  }
+  summary{ cursor: pointer; list-style: none; user-select: none; }
   summary::-webkit-details-marker{ display:none; }
-
   .summary__chevron{
-    flex: none;
-    width: 20px; height: 20px;
+    flex: none; width: 22px; height: 22px;
     color: var(--text-faint);
     transition: transform .3s ease;
   }
   details[open] > summary .summary__chevron{ transform: rotate(90deg); }
 
-  /* ---------------- TIMELINE (hành trình gợi ý) ---------------- */
+  /* ---------------- TIMELINE ---------------- */
   details.timeline-toggle{
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    background: linear-gradient(180deg, rgba(20,23,31,0.72), rgba(26,30,44,0.28));
     border: 1px solid var(--border);
-    border-radius: 16px;
-    margin: 48px 0 18px;
+    border-radius: 18px;
+    margin: 54px 0 22px;
     overflow: hidden;
+    backdrop-filter: blur(6px);
     transition: border-color .3s ease;
   }
   details.timeline-toggle[open]{ border-color: var(--border-hi); }
 
   .timeline-toggle__summary{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 20px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 24px 26px;
     transition: color .25s ease;
   }
   .timeline-toggle__summary:hover{ color: var(--gold); }
-
   .timeline-toggle__eyebrow{
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin: 0 0 6px;
-    font-weight: 500;
+    font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 6px; font-style: italic;
   }
   .timeline-toggle__title{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(19px, 4.2vw, 24px);
-    margin: 0 0 4px;
-    letter-spacing: 0.02em;
-    color: var(--text);
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(24px, 5vw, 32px);
+    margin: 0 0 5px; letter-spacing: 0.01em; color: var(--text);
   }
-  .timeline-toggle__desc{
-    font-size: 13px;
-    color: var(--text-faint);
-    margin: 0;
+  .timeline-toggle__desc{ font-size: 15px; color: var(--text-faint); margin: 0; font-style: italic; }
+
+  .timeline-viewport{ position: relative; }
+
+  /* dải nền chuyển sắc: dịu → cosmic */
+  .timeline-track{
+    position: absolute;
+    left: 56px; right: 56px;
+    top: 50%;
+    height: 2px;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg,
+      rgba(168,162,146,0.22) 0%,
+      rgba(233,176,74,0.30) 38%,
+      rgba(155,140,255,0.55) 72%,
+      rgba(207,200,255,0.85) 100%);
+    z-index: 0;
+    border-radius: 999px;
+    pointer-events: none;
   }
 
   .timeline-row{
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    padding: 4px 56px 28px;
+    position: relative;
+    z-index: 1;
+    display: flex; align-items: stretch; gap: 0;
+    padding: 8px 56px 30px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -226,231 +186,165 @@
     scrollbar-width: thin;
   }
   .timeline-row::-webkit-scrollbar{ height: 12px; }
-  .timeline-row::-webkit-scrollbar-track{
-    background: rgba(255,255,255,0.04);
-    border-radius: 999px;
-    margin: 0 22px;
-  }
+  .timeline-row::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); border-radius:999px; margin:0 24px; }
   .timeline-row::-webkit-scrollbar-thumb{
     background: linear-gradient(90deg, var(--gold), var(--violet));
-    border-radius: 999px;
-    border: 3px solid transparent;
-    background-clip: padding-box;
+    border-radius:999px; border:3px solid transparent; background-clip: padding-box;
   }
 
-  /* hộp chứa hàng + 2 nút điều hướng */
-  .timeline-viewport{
-    position: relative;
-  }
   .timeline-nav{
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px; height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-hi);
-    border-radius: 999px;
-    background: rgba(12,14,22,0.92);
-    color: var(--text);
-    cursor: pointer;
-    z-index: 2;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px;
+    display: flex; align-items:center; justify-content:center;
+    border: 1px solid var(--border-hi); border-radius: 999px;
+    background: rgba(7,8,15,0.94); color: var(--text);
+    cursor: pointer; z-index: 3;
     transition: background-color .2s ease, transform .2s ease, opacity .2s ease;
     box-shadow: 0 6px 18px -8px rgba(0,0,0,0.6);
   }
-  .timeline-nav:hover{
-    background: var(--gold);
-    color: var(--bg-deep);
-    transform: translateY(-50%) scale(1.06);
-  }
-  .timeline-nav[disabled]{
-    opacity: 0;
-    pointer-events: none;
-  }
-  .timeline-nav--prev{ left: 6px; }
-  .timeline-nav--next{ right: 6px; }
+  .timeline-nav:hover{ background: var(--gold); color: var(--bg-deep); transform: translateY(-50%) scale(1.06); }
+  .timeline-nav[disabled]{ opacity: 0; pointer-events: none; }
+  .timeline-nav--prev{ left: 8px; }
+  .timeline-nav--next{ right: 8px; }
   .timeline-nav svg{ width: 18px; height: 18px; }
 
+  /* mỗi chặng: độ "fantasy" tăng dần theo biến --t (0=dịu, 1=cosmic) */
   .timeline-step{
+    --t: 0;
+    --step-color: var(--gold);
+    position: relative;
     flex: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-decoration: none;
-    color: var(--text);
-    background: rgba(15,18,26,0.45);
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--step-color, var(--gold));
-    border-radius: 10px;
-    padding: 13px 18px;
-    min-width: 158px;
+    display: flex; flex-direction: column; justify-content: center;
+    text-decoration: none; color: var(--text);
+    border-radius: 12px;
+    padding: 16px 20px;
+    min-width: 168px;
     scroll-snap-align: start;
-    transition: border-color .25s ease, transform .2s ease, background-color .4s ease, box-shadow .25s ease;
+    /* nền: từ phẳng mờ → có gradient cosmic phát sáng */
+    background:
+      radial-gradient(120% 140% at 50% -20%,
+        color-mix(in srgb, var(--step-color) calc(var(--t) * 26%), transparent),
+        transparent 70%),
+      rgba(15,18,26,calc(0.34 + var(--t) * 0.20));
+    border: 1px solid color-mix(in srgb, var(--step-color) calc(8% + var(--t) * 34%), var(--border));
+    border-top: 2px solid color-mix(in srgb, var(--step-color) calc(40% + var(--t) * 60%), transparent);
+    box-shadow: 0 calc(2px + var(--t) * 16px) calc(8px + var(--t) * 30px) calc(-6px - var(--t) * 8px)
+                color-mix(in srgb, var(--step-color) calc(var(--t) * 70%), transparent);
+    transition: transform .2s ease, box-shadow .3s ease, border-color .3s ease;
   }
+  .timeline-step:not(:last-of-type){ margin-right: 0; }
   .timeline-step:hover{
-    border-color: var(--border-hi);
-    border-top-color: var(--step-color, var(--gold));
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px -14px var(--step-color, var(--gold));
+    transform: translateY(-3px);
+    box-shadow: 0 calc(8px + var(--t) * 18px) calc(22px + var(--t) * 26px) -12px
+                color-mix(in srgb, var(--step-color) calc(40% + var(--t) * 50%), transparent);
   }
   .timeline-step--ourera{ --step-color: var(--gold); }
   .timeline-step--mythren{ --step-color: var(--violet); }
 
+  /* hạt sáng cosmic xuất hiện ở các chặng sâu (opacity = --t) */
+  .timeline-step::after{
+    content:"";
+    position: absolute; inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: var(--t);
+    background-image:
+      radial-gradient(1.5px 1.5px at 22% 30%, rgba(255,255,255,.85), transparent 60%),
+      radial-gradient(1px 1px at 68% 22%, color-mix(in srgb, var(--step-color) 80%, white), transparent 60%),
+      radial-gradient(1.5px 1.5px at 80% 70%, rgba(255,255,255,.7), transparent 60%),
+      radial-gradient(1px 1px at 40% 78%, color-mix(in srgb, var(--step-color) 70%, white), transparent 60%);
+  }
+
   .timeline-step__lib{
-    font-size: 10.5px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--step-color, var(--gold));
-    margin: 0 0 4px;
-    font-weight: 600;
+    font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--step-color); margin: 0 0 7px; font-style: italic;
+    line-height: 1.35; min-height: 1.35em;
   }
   .timeline-step__name{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.01em;
-    margin: 0;
+    font-family: var(--display); font-weight: 700;
+    font-size: 19px; letter-spacing: 0.01em; margin: 0;
+    position: relative; z-index: 1;
+    text-shadow: 0 0 calc(var(--t) * 16px) color-mix(in srgb, var(--step-color) calc(var(--t)*90%), transparent);
   }
 
   .timeline-arrow{
-    flex: none;
-    align-self: center;
-    color: var(--text-faint);
-    font-size: 16px;
-    padding: 0 10px;
+    flex: none; align-self: center;
+    color: var(--text-faint); font-size: 17px; padding: 0 12px;
+    position: relative; z-index: 1;
   }
 
   /* ---------------- 2 THƯ VIỆN ---------------- */
   .lib-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
-    align-items: start;
-    margin: 0 0 56px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    align-items: start; margin: 0 0 60px;
   }
   details.lib-card{
-    --accent: var(--gold);
-    --accent-soft: var(--gold-soft);
+    --accent: var(--gold); --accent-soft: var(--gold-soft);
     position: relative;
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
-    border: 1px solid var(--border);
-    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(20,23,31,0.78), rgba(26,30,44,0.30));
+    border: 1px solid var(--border); border-radius: 18px;
     overflow: hidden;
+    backdrop-filter: blur(6px);
     transition: border-color .3s ease, box-shadow .3s ease;
   }
   details.lib-card[open]{
     border-color: color-mix(in srgb, var(--accent) 45%, var(--border-hi));
-    box-shadow: 0 18px 40px -28px var(--accent);
+    box-shadow: 0 20px 46px -30px var(--accent);
   }
   details.lib-card--mythren{ --accent: var(--violet); --accent-soft: var(--violet-soft); }
-
-  /* dải sáng mỏng phía trên mỗi thẻ thư viện theo màu riêng */
   details.lib-card::before{
-    content:"";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: .8;
+    opacity:.85;
   }
 
   .lib-card__summary{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    text-align: center;
-    padding: 48px 28px 40px;
-    min-height: 220px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:11px; text-align:center; padding: 34px 22px 26px;
     transition: color .25s ease;
   }
   .lib-card__summary:hover{ color: var(--accent); }
-
-  .lib-card__icon{
-    width: 48px; height: 48px;
-    color: var(--accent);
-    opacity: .9;
+  .lib-card__icon{ width:36px; height:36px; color: var(--accent); opacity:.92; }
+  .lib-card__eyebrow{
+    font-size:12px; letter-spacing:0.3em; text-transform:uppercase;
+    color: var(--accent); margin:0; font-style: italic;
   }
-
   .lib-card__title{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(28px, 6vw, 38px);
-    letter-spacing: 0.03em;
-    margin: 0;
-    line-height: 1.2;
+    font-family: var(--display); font-weight:700;
+    font-size: clamp(26px, 5.4vw, 36px); letter-spacing:0.02em; margin:0; line-height:1.16;
   }
   .lib-card__tagline{
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 15px;
-    color: var(--text-dim);
-    margin: 0;
-    max-width: 32ch;
+    font-style: italic; font-size:16px; color: var(--text-dim); margin:0; max-width:30ch;
   }
-  .lib-card__summary .summary__chevron{
-    margin-top: 4px;
-    color: var(--text-faint);
-  }
+  .lib-card__summary .summary__chevron{ margin-top:6px; color: var(--text-faint); }
 
   .lib-card__body{
-    padding: 4px 18px 18px;
-    border-top: 1px solid var(--border);
-    margin: 0 18px;
+    padding: 4px 20px 20px; border-top: 1px solid var(--border); margin: 0 20px;
   }
-
-  .parts{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+  .parts{ list-style:none; margin:0; padding:0; }
   .part{
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border-top: 1px solid var(--border);
-    padding: 16px 4px;
-    border-radius: 10px;
+    display:flex; align-items:center; flex-wrap:wrap; gap:10px 16px;
+    border-top: 1px solid var(--border); padding: 18px 6px; border-radius:12px;
     transition: background-color .4s ease, box-shadow .4s ease;
-    scroll-margin-top: 24px;
+    scroll-margin-top: 28px;
   }
-  .part:first-child{ border-top: none; padding-top: 18px; }
-
+  .part:first-child{ border-top:none; padding-top:20px; }
   .part__num{
-    flex: none;
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: 22px;
-    color: var(--text-faint);
-    min-width: 1.6em;
-    text-align: center;
+    flex:none; font-family: var(--display); font-weight:700; font-size:26px;
+    color: var(--text-faint); min-width:1.6em; text-align:center;
   }
-  .part__main{ flex: 1; min-width: 0; }
+  .part__main{ flex:1 1 9em; min-width:0; }
   .part__name{
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(16px, 3.8vw, 18px);
-    letter-spacing: 0.01em;
-    margin: 0;
-    color: var(--text);
+    font-family: var(--display); font-weight:700;
+    font-size: clamp(18px, 4vw, 21px); letter-spacing:0.01em; margin:0; color: var(--text);
+    text-wrap: pretty; line-height:1.3;
   }
 
-  /* ---------------- NÚT TẢI ---------------- */
   .part__download{
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--body);
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--bg-deep);
-    background: var(--accent, var(--gold));
-    text-decoration: none;
-    padding: 9px 16px;
-    border-radius: 999px;
+    flex:none; margin-left:auto; display:inline-flex; align-items:center; gap:9px;
+    font-family: var(--body); font-size:15px; font-weight:700;
+    color: var(--bg-deep); background: var(--accent, var(--gold));
+    text-decoration:none; padding:10px 18px; border-radius:999px;
     transition: background .25s ease, transform .15s ease, box-shadow .25s ease;
   }
   .part__download:hover{
@@ -458,61 +352,47 @@
     box-shadow: 0 6px 18px -6px var(--accent, var(--gold));
   }
   .part__download:active{ transform: translateY(1px); }
-  .part__download svg{ width:14px; height:14px; }
+  .part__download svg{ width:15px; height:15px; }
 
-  /* Hiệu ứng "vừa nhảy tới" khi bấm từ Timeline */
   .part.is-target{
-    background-color: rgba(233,176,74,0.08);
+    background-color: rgba(233,176,74,0.10);
     box-shadow: inset 3px 0 0 0 var(--accent, var(--gold));
   }
 
-  /* ---------------- FOOTER ---------------- */
   footer{
     border-top: 1px solid var(--border);
-    padding: 36px 0 64px;
-    text-align: center;
-    color: var(--text-faint);
-    font-size: 13px;
-    line-height: 1.8;
+    padding: 40px 0 70px; text-align:center;
+    color: var(--text-faint); font-size:15px; line-height:1.85;
   }
   footer .footer__brand{
-    font-family: var(--display);
-    letter-spacing: 0.18em;
-    color: var(--text-dim);
-    font-size: 12px;
-    text-transform: uppercase;
+    font-family: var(--display); letter-spacing:0.2em; color: var(--text-dim);
+    font-size:14px; text-transform:uppercase;
   }
   footer a{ color: var(--text-dim); }
 
-  a:focus-visible, summary:focus-visible{ outline: 2px solid var(--gold-soft); outline-offset: 3px; border-radius: 6px; }
+  a:focus-visible, summary:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:3px; border-radius:6px; }
 
   @media (prefers-reduced-motion: reduce){
     details.timeline-toggle, details.lib-card, .timeline-step, .part__download, .part, .summary__chevron{ transition:none; }
   }
-
-  @media (max-width: 560px){
-    .lib-grid{ grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 480px){
-    .hero{ padding: 64px 0 30px; }
-    .timeline-toggle__summary, .lib-card__body{ padding-left: 16px; padding-right: 16px; }
-    .lib-card__body{ margin: 0 14px; }
-    .part{ flex-wrap: wrap; }
-    .part__download{ margin-left: calc(1.6em + 14px); }
+  @media (max-width:560px){ .lib-grid{ grid-template-columns:1fr; } }
+  @media (max-width:480px){
+    .hero{ padding: 76px 0 32px; }
+    .timeline-toggle__summary, .lib-card__body{ padding-left:16px; padding-right:16px; }
+    .lib-card__body{ margin:0 14px; }
+    .part{ flex-wrap:wrap; }
+    .part__download{ margin-left: calc(1.6em + 16px); }
   }
 </style>
 </head>
 
 <body>
 
-  <div class="cosmos" aria-hidden="true"></div>
+  <canvas id="cosmos" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
 
   <div class="wrap">
 
-    <!-- ============================================================== -->
-    <!--  ĐẦU TRANG — đổi tên trang & câu slogan ở đây                  -->
-    <!-- ============================================================== -->
     <header class="hero">
       <p class="hero__kicker"><span>OurEra</span> &amp; <em>High and Higher</em></p>
       <h1 class="hero__title">Thư Viện</h1>
@@ -523,143 +403,98 @@
       </div>
     </header>
 
-    <!-- ============================================================== -->
-    <!--  TIMELINE — thứ tự đọc theo gợi ý của tác giả                  -->
-    <!--                                                                -->
-    <!--  ➜ Bấm vào "Hành Trình Gợi Ý" để mở 1 hàng ngang gồm các PHẦN, -->
-    <!--    theo đúng thứ tự bạn muốn người đọc đi qua.                 -->
-    <!--  ➜ Mỗi mục là 1 <a class="timeline-step"> trỏ tới id của      -->
-    <!--    1 <li class="part" id="..."> bên dưới (trong đúng thư viện).-->
-    <!--  ➜ Thêm class "timeline-step--ourera" hoặc                    -->
-    <!--    "timeline-step--mythren" để tô màu theo thư viện.           -->
-    <!--  ➜ Để thêm 1 bước: copy khối "===== KHỐI MẪU 1 BƯỚC =====",   -->
-    <!--    dán vào đúng vị trí trong thứ tự, kèm 1 mũi tên "→" trước nó.-->
-    <!-- ============================================================== -->
     <details class="timeline-toggle">
       <summary class="timeline-toggle__summary">
         <div>
           <p class="timeline-toggle__eyebrow">Lộ trình của tác giả</p>
-          <p class="timeline-toggle__title">Lộ Trình Đọc</p>
-          <p class="timeline-toggle__desc">Bấm vào một chặng để đến thẳng phần truyện đó</p>
+          <p class="timeline-toggle__title">Hành Trình Gợi Ý</p>
+          <p class="timeline-toggle__desc">Khởi đầu dịu dàng — càng đi sâu, càng lạc vào vũ trụ</p>
         </div>
-        <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
       </summary>
       <div class="timeline-viewport">
-      <button type="button" class="timeline-nav timeline-nav--prev" aria-label="Cuộn về chặng trước" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
-      </button>
-      <button type="button" class="timeline-nav timeline-nav--next" aria-label="Cuộn tới chặng kế tiếp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-      </button>
-      <div class="timeline-row">
+        <span class="timeline-track" aria-hidden="true"></span>
+        <button type="button" class="timeline-nav timeline-nav--prev" aria-label="Cuộn về chặng trước" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        </button>
+        <button type="button" class="timeline-nav timeline-nav--next" aria-label="Cuộn tới chặng kế tiếp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+        <div class="timeline-row">
 
-        <!-- ===== KHỐI MẪU 1 BƯỚC (copy để thêm bước mới) ===== -->
-        <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p1">
-          <p class="timeline-step__lib">OurEra</p>
-          <p class="timeline-step__name">Phần 1</p>
-        </a>
-        <!-- ===== HẾT KHỐI MẪU ===== -->
+          <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p1">
+            <p class="timeline-step__lib">OurEra</p>
+            <p class="timeline-step__name">Phần 1</p>
+          </a>
+          <span class="timeline-arrow" aria-hidden="true">→</span>
+          <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p1">
+            <p class="timeline-step__lib">High and Higher</p>
+            <p class="timeline-step__name">Phần 1</p>
+          </a>
+          <span class="timeline-arrow" aria-hidden="true">→</span>
+          <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p2">
+            <p class="timeline-step__lib">OurEra</p>
+            <p class="timeline-step__name">Phần 2</p>
+          </a>
+          <span class="timeline-arrow" aria-hidden="true">→</span>
+          <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p2">
+            <p class="timeline-step__lib">High and Higher</p>
+            <p class="timeline-step__name">Phần 2</p>
+          </a>
+          <span class="timeline-arrow" aria-hidden="true">→</span>
+          <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p3">
+            <p class="timeline-step__lib">OurEra</p>
+            <p class="timeline-step__name">Phần 3</p>
+          </a>
+          <span class="timeline-arrow" aria-hidden="true">→</span>
+          <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p3">
+            <p class="timeline-step__lib">High and Higher</p>
+            <p class="timeline-step__name">Phần 3</p>
+          </a>
 
-        <span class="timeline-arrow" aria-hidden="true">→</span>
-
-        <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p1">
-          <p class="timeline-step__lib">High and Higher</p>
-          <p class="timeline-step__name">Phần 1</p>
-        </a>
-
-        <span class="timeline-arrow" aria-hidden="true">→</span>
-
-        <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p2">
-          <p class="timeline-step__lib">OurEra</p>
-          <p class="timeline-step__name">Phần 2</p>
-        </a>
-
-        <span class="timeline-arrow" aria-hidden="true">→</span>
-
-        <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p2">
-          <p class="timeline-step__lib">High and Higher</p>
-          <p class="timeline-step__name">Phần 2</p>
-        </a>
-
-        <span class="timeline-arrow" aria-hidden="true">→</span>
-
-        <a class="timeline-step timeline-step--ourera" href="#ourera-mau-p3">
-          <p class="timeline-step__lib">OurEra</p>
-          <p class="timeline-step__name">Phần 3</p>
-        </a>
-
-        <span class="timeline-arrow" aria-hidden="true">→</span>
-
-        <a class="timeline-step timeline-step--mythren" href="#mythren-mau-p3">
-          <p class="timeline-step__lib">High and Higher</p>
-          <p class="timeline-step__name">Phần 3</p>
-        </a>
-
-      </div>
+        </div>
       </div>
     </details>
 
-    <!-- ============================================================== -->
-    <!--  2 THƯ VIỆN — bấm vào tên để mở danh sách các PHẦN             -->
-    <!--                                                                -->
-    <!--  ➜ Mỗi <li class="part" id="..."> là 1 PHẦN, có nút tải về.   -->
-    <!--  ➜ id của mỗi phần dùng để Timeline ở trên trỏ tới.            -->
-    <!--  ➜ Để thêm 1 PHẦN mới: copy khối                               -->
-    <!--    "===== KHỐI MẪU 1 PHẦN =====", dán vào <ol class="parts">. -->
-    <!--    Số thứ tự (.part__num) chỉ là trang trí, sửa tay nếu cần.   -->
-    <!--  ➜ Nhớ bỏ file .docx vào chapters/<thư-viện>/<bộ-truyện>/      -->
-    <!--  ➜ Sửa câu mô tả ngắn (.lib-card__tagline) cho từng thư viện.  -->
-    <!-- ============================================================== -->
     <nav class="lib-grid" aria-label="Hai thư viện">
 
       <details class="lib-card lib-card--ourera" open>
         <summary class="lib-card__summary">
           <svg class="lib-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4.5"/>
-            <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8M18.7 18.7l-1.8-1.8M7.1 7.1L5.3 5.3"/>
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8M18.7 18.7l-1.8-1.8M7.1 7.1L5.3 5.3"></path>
           </svg>
+          <p class="lib-card__eyebrow">Thế giới thứ nhất</p>
           <h2 class="lib-card__title">OurEra</h2>
           <p class="lib-card__tagline">Trái Đất — nơi những điều bình thường giấu một phép màu nhỏ.</p>
-          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
         </summary>
         <div class="lib-card__body">
           <ol class="parts">
-
-            <!-- ===== KHỐI MẪU 1 PHẦN (copy để thêm phần mới) ===== -->
             <li class="part" id="ourera-mau-p1">
               <span class="part__num">01</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 1</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 1</h3></div>
               <a class="part__download" href="chapters/ourera/bo-truyen-mau/phan-1.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-            <!-- ===== HẾT KHỐI MẪU ===== -->
-
             <li class="part" id="ourera-mau-p2">
               <span class="part__num">02</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 2</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 2</h3></div>
               <a class="part__download" href="chapters/ourera/bo-truyen-mau/phan-2.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
             <li class="part" id="ourera-mau-p3">
               <span class="part__num">03</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 3</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 3</h3></div>
               <a class="part__download" href="chapters/ourera/bo-truyen-mau/phan-3.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
           </ol>
         </div>
       </details>
@@ -667,59 +502,47 @@
       <details class="lib-card lib-card--mythren" open>
         <summary class="lib-card__summary">
           <svg class="lib-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 2.5l2.2 5.6 6 .5-4.6 3.9 1.5 5.8-5.1-3.2-5.1 3.2 1.5-5.8-4.6-3.9 6-.5z"/>
+            <path d="M12 2.5l2.2 5.6 6 .5-4.6 3.9 1.5 5.8-5.1-3.2-5.1 3.2 1.5-5.8-4.6-3.9 6-.5z"></path>
           </svg>
+          <p class="lib-card__eyebrow">Thế giới thứ hai</p>
           <h2 class="lib-card__title">High and Higher</h2>
           <p class="lib-card__tagline">Mythren — vương quốc trên những tầng trời, nơi phép màu là quy luật.</p>
-          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
         </summary>
         <div class="lib-card__body">
           <ol class="parts">
-
             <li class="part" id="mythren-ngan-dam-phu-hoa-p1">
               <span class="part__num">01</span>
-              <div class="part__main">
-                <h3 class="part__name">Ngàn Dặm Phù Hoa — Phần 1</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Ngàn Dặm Phù Hoa — Phần 1</h3></div>
               <a class="part__download" href="chapters/mythren/ngan-dam-phu-hoa/phan-1.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
             <li class="part" id="mythren-mau-p1">
               <span class="part__num">02</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 1</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 1</h3></div>
               <a class="part__download" href="chapters/mythren/bo-truyen-mau/phan-1.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
             <li class="part" id="mythren-mau-p2">
               <span class="part__num">03</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 2</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 2</h3></div>
               <a class="part__download" href="chapters/mythren/bo-truyen-mau/phan-2.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
             <li class="part" id="mythren-mau-p3">
               <span class="part__num">04</span>
-              <div class="part__main">
-                <h3 class="part__name">Phần 3</h3>
-              </div>
+              <div class="part__main"><h3 class="part__name">Phần 3</h3></div>
               <a class="part__download" href="chapters/mythren/bo-truyen-mau/phan-3.docx" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>
                 Tải .docx
               </a>
             </li>
-
           </ol>
         </div>
       </details>
@@ -735,56 +558,308 @@
   </div>
 
   <script>
-    // Bấm vào 1 bước trong Timeline -> mở thư viện chứa phần đó,
-    // cuộn tới phần và làm nổi bật trong giây lát.
-    (function(){
-      function revealTarget(){
-        var hash = window.location.hash;
-        if(!hash || hash.length < 2) return;
-        var target;
-        try{ target = document.querySelector(hash); } catch(e){ return; }
-        if(!target) return;
+  /* Cường độ vũ trụ: 0 = đầu timeline (dịu) → 1 = cuối timeline (cosmic).
+     Được cập nhật khi cuộn timeline, được nền canvas đọc để biến đổi. */
+  var cosmicDepth = 0;
 
-        var node = target;
-        while(node){
-          if(node.tagName === 'DETAILS') node.open = true;
-          node = node.parentElement;
+  /* ============ NỀN VŨ TRỤ TƯƠNG TÁC ============ */
+  (function(){
+    var canvas = document.getElementById('cosmos');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var glow = 0; // bản làm mượt của cosmicDepth
+
+    var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var stars = [], dust = [], shooting = [], rot = 0;
+    var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, down:false };
+    var pointerActive = false;
+
+    function resize(){
+      W = canvas.clientWidth = window.innerWidth;
+      H = canvas.clientHeight = window.innerHeight;
+      canvas.width = W * DPR; canvas.height = H * DPR;
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+      build();
+    }
+
+    function build(){
+      var maxR = Math.hypot(W, H) * 0.82;
+      stars = [];
+      var count = Math.round((W*H)/1500);
+      for(var i=0;i<count;i++){
+        var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
+        var tint = Math.random();
+        var col = '255,255,255';
+        if(tint > 0.93) col = '245,210,138';        // đốm kim sắc
+        else if(tint > 0.85) col = '210,200,255';    // đốm tím
+        else if(tint > 0.74) col = '175,222,255';    // trắng xanh
+        stars.push({
+          radius: radius,
+          ang: Math.random()*Math.PI*2,
+          w: 0.5 + Math.random()*1.5,
+          base: 0.3 + Math.random()*0.6,
+          col: col,
+          spin: 1 + (Math.random()-0.5)*0.10,        // biến thiên nhẹ cho tự nhiên
+          tw: Math.random()*Math.PI*2,
+          tws: 0.6 + Math.random()*1.4
+        });
+      }
+      dust = [];
+      var dn = Math.round((W*H)/60000);
+      for(var j=0;j<dn;j++){
+        dust.push({
+          radius: Math.random()*maxR,
+          ang: Math.random()*Math.PI*2,
+          r: 28 + Math.random()*64,
+          hue: Math.random() < 0.5 ? 'g' : 'v',
+          a: 0.04 + Math.random()*0.05
+        });
+      }
+    }
+
+    // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ
+    function drawAurora(){
+      var ac = W*0.5, ay0 = H*0.46;
+      // cực quang tím: chính, mạnh dần theo glow
+      var v = 0.13 + glow*0.26;
+      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
+      g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
+      g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
+      g1.addColorStop(1, 'rgba(155,140,255,0)');
+      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+
+      // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu
+      var ax = W*0.82, ay = H*0.12;
+      var gg = 0.10 * (1 - glow*0.45);
+      var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
+      g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');
+      g2.addColorStop(0.45, 'rgba(233,176,74,'+(gg*0.35)+')');
+      g2.addColorStop(1, 'rgba(233,176,74,0)');
+      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+
+      // ngọc lục: nở rộ khi đi sâu
+      var bx = W*0.18, by = H*0.9;
+      var tl = 0.06 + glow*0.13;
+      var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
+      g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
+      g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');
+      g3.addColorStop(1, 'rgba(120,235,200,0)');
+      ctx.fillStyle = g3; ctx.fillRect(0,0,W,H);
+
+      // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình
+      if(glow > 0.02){
+        var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
+        g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.10)+')');
+        g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.03)+')');
+        g4.addColorStop(1, 'rgba(190,120,235,0)');
+        ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);
+      }
+    }
+
+    function spawnShoot(px, py){
+      var ang = Math.PI*0.18 + (Math.random()-0.5)*0.5;
+      var sp = 9 + Math.random()*7;
+      shooting.push({
+        x: px, y: py,
+        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp,
+        life: 1, len: 80 + Math.random()*70,
+        hue: Math.random()<0.5?'g':'v'
+      });
+    }
+
+    var t = 0;
+    function frame(){
+      t += 0.016;
+      ctx.clearRect(0,0,W,H);
+
+      // làm mượt cường độ vũ trụ theo độ sâu timeline
+      glow += ((typeof cosmicDepth === 'number' ? cosmicDepth : 0) - glow) * 0.05;
+
+      // con trỏ mượt dần
+      mouse.x += (mouse.tx - mouse.x)*0.06;
+      mouse.y += (mouse.ty - mouse.y)*0.06;
+      var mx = mouse.x*W, my = mouse.y*H;
+
+      drawAurora();
+
+      // tâm xoay cố định (đứng yên), không theo con trỏ
+      var cx = W*0.5, cy = H*0.46;
+      var spinSpeed = reduce ? 0 : (0.0010 + glow*0.0022);
+      rot += spinSpeed;
+
+      // độ dài vệt cung — dài & rực hơn khi đi sâu timeline
+      var trail = 0.36 + glow*0.7;
+      var segs = 9;
+
+      // quầng bụi vũ trụ (mờ, cũng quay quanh tâm)
+      for(var d=0; d<dust.length; d++){
+        var p = dust[d];
+        var pa = p.ang + rot*0.6;
+        var px = cx + Math.cos(pa)*p.radius;
+        var py = cy + Math.sin(pa)*p.radius;
+        var da = p.a * (1 + glow*1.1);
+        var dg = ctx.createRadialGradient(px,py,0,px,py,p.r);
+        var dc = p.hue==='g' ? '245,210,138' : '200,195,255';
+        dg.addColorStop(0,'rgba('+dc+','+da+')');
+        dg.addColorStop(1,'rgba('+dc+',0)');
+        ctx.fillStyle = dg;
+        ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2); ctx.fill();
+      }
+
+      // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
+      ctx.lineCap = 'round';
+      for(var i=0;i<stars.length;i++){
+        var s = stars[i];
+        var ang = s.ang + rot * s.spin;
+        var tw = reduce ? 1 : (0.7 + 0.3*Math.sin(t*s.tws + s.tw));
+        var bright = Math.min(1, s.base * tw * (1 + glow*0.5));
+        var lw = s.w * (1 + glow*0.25);
+
+        // vị trí đầu sao + sáng lên khi gần con trỏ
+        var hx = cx + Math.cos(ang)*s.radius;
+        var hy = cy + Math.sin(ang)*s.radius;
+        var near = Math.max(0, 1 - Math.hypot(hx-mx, hy-my)/200);
+        near = near*near;
+        bright = Math.min(1, bright + near*0.9);
+        lw = lw * (1 + near*0.7);
+
+        // vệt cung mờ dần về đuôi
+        for(var seg=0; seg<segs; seg++){
+          var f0 = seg/segs;
+          var a1 = ang - trail*f0;
+          var a0 = ang - trail*((seg+1)/segs);
+          var taper = 1 - f0;
+          var alpha = bright * taper * taper;
+          if(alpha < 0.012) continue;
+          ctx.beginPath();
+          ctx.arc(cx, cy, s.radius, a0, a1);
+          ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
+          ctx.lineWidth = lw;
+          ctx.stroke();
         }
 
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        target.classList.add('is-target');
-        window.setTimeout(function(){ target.classList.remove('is-target'); }, 2200);
+        // đầu sao sáng
+        ctx.beginPath();
+        ctx.arc(hx, hy, Math.max(0.6, lw*0.9), 0, Math.PI*2);
+        ctx.fillStyle = 'rgba('+s.col+','+bright+')';
+        ctx.fill();
+        if((s.w > 1.2 && bright > 0.4) || near > 0.15){
+          ctx.beginPath();
+          ctx.arc(hx, hy, lw*2.6 + near*7, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12 + near*0.2)+')';
+          ctx.fill();
+        }
       }
 
-      window.addEventListener('hashchange', revealTarget);
-      window.addEventListener('load', function(){ window.setTimeout(revealTarget, 60); });
-    })();
-
-    // 2 nút mũi tên cho hàng Timeline — bấm để cuộn ngang theo từng cụm.
-    (function(){
-      var row  = document.querySelector('.timeline-row');
-      var prev = document.querySelector('.timeline-nav--prev');
-      var next = document.querySelector('.timeline-nav--next');
-      if(!row || !prev || !next) return;
-
-      function step(){
-        var card = row.querySelector('.timeline-step');
-        var w = card ? card.getBoundingClientRect().width : 180;
-        return Math.max(160, w + 24);
+      // sao băng
+      for(var k=shooting.length-1;k>=0;k--){
+        var st = shooting[k];
+        st.x += st.vx; st.y += st.vy; st.life -= 0.018;
+        if(st.life <= 0 || st.x>W+120 || st.y>H+120){ shooting.splice(k,1); continue; }
+        var tailx = st.x - st.vx*(st.len/Math.hypot(st.vx,st.vy));
+        var taily = st.y - st.vy*(st.len/Math.hypot(st.vx,st.vy));
+        var grad = ctx.createLinearGradient(st.x, st.y, tailx, taily);
+        var col = st.hue==='g' ? '245,210,138' : '207,200,255';
+        grad.addColorStop(0, 'rgba('+col+','+(0.9*st.life)+')');
+        grad.addColorStop(1, 'rgba('+col+',0)');
+        ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tailx, taily); ctx.stroke();
+        ctx.beginPath(); ctx.arc(st.x, st.y, 2.2, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba('+col+','+st.life+')'; ctx.fill();
       }
-      function update(){
-        prev.disabled = row.scrollLeft <= 4;
-        next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+
+      requestAnimationFrame(frame);
+    }
+
+    // tương tác
+    window.addEventListener('pointermove', function(e){
+      pointerActive = true;
+      mouse.tx = e.clientX / window.innerWidth;
+      mouse.ty = e.clientY / window.innerHeight;
+    }, { passive:true });
+
+    window.addEventListener('pointerdown', function(e){
+      spawnShoot(e.clientX, e.clientY);
+    }, { passive:true });
+
+    // thiết bị cảm ứng / không di chuột: tự trôi nhẹ
+    setInterval(function(){
+      if(!pointerActive && !reduce){
+        mouse.tx = 0.5 + Math.sin(t*0.3)*0.18;
+        mouse.ty = 0.5 + Math.cos(t*0.22)*0.14;
       }
-      prev.addEventListener('click', function(){ row.scrollBy({ left: -step()*2, behavior: 'smooth' }); });
-      next.addEventListener('click', function(){ row.scrollBy({ left:  step()*2, behavior: 'smooth' }); });
-      row.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      // cập nhật lần đầu (sau khi <details> mở)
-      var toggle = document.querySelector('details.timeline-toggle');
-      if(toggle) toggle.addEventListener('toggle', function(){ window.setTimeout(update, 50); });
-      window.setTimeout(update, 60);
-    })();
+    }, 60);
+
+    // sao băng tự nhiên — dày hơn khi đi sâu vào timeline
+    setInterval(function(){
+      if(!reduce && Math.random() < 0.35 + glow*0.5){
+        spawnShoot(Math.random()*W*0.5, Math.random()*H*0.3);
+      }
+    }, 4200 - glow*2400);
+
+    window.addEventListener('resize', resize);
+    resize();
+    mouse.x = mouse.tx; mouse.y = mouse.ty;
+    requestAnimationFrame(frame);
+  })();
+
+  /* ============ TIMELINE: ramp độ fantasy + điều hướng ============ */
+  (function(){
+    // gán --t tăng dần cho từng chặng (0 → 1)
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.timeline-step'));
+    var n = steps.length;
+    steps.forEach(function(s, i){
+      var t = n > 1 ? i/(n-1) : 0;
+      s.style.setProperty('--t', t.toFixed(3));
+    });
+  })();
+
+  (function(){
+    function revealTarget(){
+      var hash = window.location.hash;
+      if(!hash || hash.length < 2) return;
+      var target;
+      try{ target = document.querySelector(hash); } catch(e){ return; }
+      if(!target) return;
+      var node = target;
+      while(node){
+        if(node.tagName === 'DETAILS') node.open = true;
+        node = node.parentElement;
+      }
+      target.scrollIntoView({ behavior:'smooth', block:'center' });
+      target.classList.add('is-target');
+      window.setTimeout(function(){ target.classList.remove('is-target'); }, 2200);
+    }
+    window.addEventListener('hashchange', revealTarget);
+    window.addEventListener('load', function(){ window.setTimeout(revealTarget, 60); });
+  })();
+
+  (function(){
+    var row  = document.querySelector('.timeline-row');
+    var prev = document.querySelector('.timeline-nav--prev');
+    var next = document.querySelector('.timeline-nav--next');
+    if(!row || !prev || !next) return;
+    function step(){
+      var card = row.querySelector('.timeline-step');
+      var w = card ? card.getBoundingClientRect().width : 180;
+      return Math.max(160, w + 24);
+    }
+    function update(){
+      prev.disabled = row.scrollLeft <= 4;
+      next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+      // tiến trình cuộn timeline → cường độ vũ trụ của nền
+      var max = row.scrollWidth - row.clientWidth;
+      cosmicDepth = max > 8 ? Math.min(1, Math.max(0, row.scrollLeft / max)) : 0;
+    }
+    prev.addEventListener('click', function(){ row.scrollBy({ left:-step()*2, behavior:'smooth' }); });
+    next.addEventListener('click', function(){ row.scrollBy({ left: step()*2, behavior:'smooth' }); });
+    row.addEventListener('scroll', update, { passive:true });
+    window.addEventListener('resize', update);
+    var toggle = document.querySelector('details.timeline-toggle');
+    if(toggle) toggle.addEventListener('toggle', function(){ window.setTimeout(update, 50); });
+    window.setTimeout(update, 60);
+  })();
   </script>
 
 </body>
