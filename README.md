@@ -1,13 +1,12 @@
-# Hai Thư Viện — đọc & tải truyện theo chương
+# Thư viện — đọc & tải truyện theo chương
 
-Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. Trang chủ có **2 thư viện**:
+Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. Trang có:
 
-- **OurEra** (Trái Đất)
-- **High and Higher** (Mythren)
-
-Mỗi thư viện chứa nhiều **bộ truyện**, mỗi bộ truyện chia thành nhiều **phần**, mỗi phần có
-nhiều **chương**. Có một **Timeline** ở đầu trang — bấm vào một mục sẽ tự mở đúng bộ
-truyện/phần và cuộn thẳng tới chương đó, kèm nút tải file Word (.docx).
+- **2 thẻ thư viện** ở đầu trang: **OurEra** và **High and Higher** (bấm để nhảy thẳng tới
+  bìa truyện thuộc thư viện đó).
+- **Timeline bìa truyện**: mỗi mục là một "bìa" đại diện cho một **phần truyện** (ví dụ
+  `OurEra — Bộ truyện mẫu — Phần 1`). Bấm vào bìa → mở ra danh sách các chương bên trong,
+  mỗi chương có nút tải file Word (.docx).
 
 ## Cấu trúc thư mục
 ```
@@ -36,40 +35,31 @@ truyện/phần và cuộn thẳng tới chương đó, kèm nút tải file Wor
 
 ## Cách thêm nội dung mới
 
-> Lưu ý: vì đây là trang tĩnh, "tải file lên" nghĩa là **thêm file vào repo trên GitHub**,
-> chứ không có ô upload trực tiếp trên trang.
-
-### 1. Thêm một CHƯƠNG mới (vào bộ truyện/phần đã có)
-1. Mở thư mục `chapters/<thư viện>/<bộ-truyện>/<phần>/` → **Add file → Upload files** → kéo
-   file `.docx` vào → Commit.
-2. Mở `index.html`, tìm khối `===== KHỐI MẪU 1 CHƯƠNG =====` bên trong `<section class="library" id="ourera">`
-   hoặc `id="mythren"` (tuỳ thư viện), trong đúng bộ truyện/phần cần thêm.
-3. Copy nguyên khối `<li class="chapter" id="..."> ... </li>`, dán **lên trên cùng** danh sách
-   `<ol class="chapters">` (chương mới nhất nằm đầu).
-4. Sửa: `id` (đặt tên duy nhất, không trùng với chương khác — ví dụ `ourera-mau-p1-c4`),
-   ngày tháng, tên chương, mô tả, và đường dẫn `href="chapters/..."`.
-5. (Khuyến khích) Thêm 1 mục mới vào **Timeline** ở đầu trang: copy khối
-   `===== KHỐI MẪU 1 MỤC TIMELINE =====`, dán lên trên cùng `<ol class="timeline">`, sửa nội
-   dung và đặt `href="#id-cua-chuong-vua-tao"` (phải trùng với `id` ở bước 4).
+### 1. Thêm một CHƯƠNG mới vào bìa truyện đã có
+1. Tải file `.docx` lên `chapters/<thư viện>/<bộ-truyện>/<phần>/`.
+2. Mở `index.html`, tìm đúng `<li class="entry" id="...">` của bìa truyện đó.
+3. Trong `<ol class="chapters">`, copy khối `===== KHỐI MẪU 1 CHƯƠNG =====` (một thẻ
+   `<li class="chapter">`), dán **lên trên cùng** danh sách (chương mới nhất ở trên).
+4. Sửa: ngày, tên chương, mô tả, và đường dẫn `href="chapters/..."`.
+5. Cập nhật `cover__meta` ở bìa (số chương · ngày cập nhật).
 6. Commit. Trang sẽ tự cập nhật sau khoảng 1 phút.
 
-### 2. Thêm một PHẦN mới (trong một bộ truyện đã có)
-1. Tạo thư mục `chapters/<thư viện>/<bộ-truyện>/<phần-mới>/` rồi tải file `.docx` chương đầu
-   tiên của phần lên đó.
-2. Trong `index.html`, copy khối `===== KHỐI MẪU 1 PHẦN =====` (một thẻ `<details class="part">`),
-   dán vào trong `<div class="series__body">` của bộ truyện tương ứng.
-3. Sửa tên phần (`.part__name`) và các chương bên trong như hướng dẫn ở mục 1.
-
-### 3. Thêm một BỘ TRUYỆN mới (trong một thư viện đã có)
-1. Tạo thư mục `chapters/<thư viện>/<bộ-truyện-mới>/<phần-1>/` rồi tải file `.docx` lên.
-2. Trong `index.html`, copy khối `===== KHỐI MẪU 1 BỘ TRUYỆN =====` (một thẻ `<details class="series">`),
-   dán vào trong `<section class="library" id="ourera">` (hoặc `id="mythren"`).
-3. Sửa tên bộ truyện (`.series__name`), mô tả (`.series__desc`) và phần/chương bên trong.
+### 2. Thêm một BÌA TRUYỆN MỚI (một phần truyện mới)
+1. Tạo thư mục `chapters/<thư viện>/<bộ-truyện>/<phần-mới>/` và tải các file `.docx` chương vào.
+2. Trong `index.html`, copy nguyên khối `===== KHỐI MẪU 1 BÌA TRUYỆN =====` (một thẻ
+   `<li class="entry">` chứa `<details class="cover">`), dán **lên trên cùng** `<ol class="timeline">`
+   (bìa mới nhất ở trên).
+3. Sửa:
+   - `id="..."` — đặt tên duy nhất (vd `ourera-bo-A-p2`).
+   - `cover__lib` — tên thư viện hiển thị (`OurEra` hay `High and Higher`).
+   - `cover__title` — tên bộ truyện và phần.
+   - `cover__meta` — số chương · ngày cập nhật.
+   - Danh sách `<li class="chapter">` bên trong (xem mục 1).
 
 ## Tuỳ chỉnh nhanh
-- **Tên trang / lời giới thiệu:** sửa trong khối `<header class="hero">` ở đầu `index.html`.
-- **Tên & mô tả 2 thư viện ở trang chủ:** sửa trong khối `<nav class="lib-grid">`.
-- **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` (ví dụ `--lamp` là màu vàng đèn).
+- **Tiêu đề trang ("Thư viện"):** sửa trong `<h1 class="hero__title">`.
+- **Tên 2 thẻ thư viện:** sửa trong khối `<nav class="lib-grid">`.
+- **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` (vd `--lamp` là màu vàng đèn).
 - **Tiêu đề tab trình duyệt:** sửa trong thẻ `<title>`.
 
 Không cần cài đặt gì cả — chỉ là một file HTML.
