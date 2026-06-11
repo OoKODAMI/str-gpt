@@ -240,12 +240,60 @@
     display: flex;
     align-items: stretch;
     gap: 0;
-    padding: 4px 22px 24px;
+    padding: 4px 56px 28px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: var(--border-hi) transparent;
+    scrollbar-width: thin;
   }
-  .timeline-row::-webkit-scrollbar{ height: 6px; }
-  .timeline-row::-webkit-scrollbar-thumb{ background: var(--border-hi); border-radius: 999px; }
+  .timeline-row::-webkit-scrollbar{ height: 12px; }
+  .timeline-row::-webkit-scrollbar-track{
+    background: rgba(255,255,255,0.04);
+    border-radius: 999px;
+    margin: 0 22px;
+  }
+  .timeline-row::-webkit-scrollbar-thumb{
+    background: linear-gradient(90deg, var(--gold), var(--violet));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* hộp chứa hàng + 2 nút điều hướng */
+  .timeline-viewport{
+    position: relative;
+  }
+  .timeline-nav{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px; height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-hi);
+    border-radius: 999px;
+    background: rgba(12,14,22,0.92);
+    color: var(--text);
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color .2s ease, transform .2s ease, opacity .2s ease;
+    box-shadow: 0 6px 18px -8px rgba(0,0,0,0.6);
+  }
+  .timeline-nav:hover{
+    background: var(--gold);
+    color: var(--bg-deep);
+    transform: translateY(-50%) scale(1.06);
+  }
+  .timeline-nav[disabled]{
+    opacity: 0;
+    pointer-events: none;
+  }
+  .timeline-nav--prev{ left: 6px; }
+  .timeline-nav--next{ right: 6px; }
+  .timeline-nav svg{ width: 18px; height: 18px; }
 
   .timeline-step{
     flex: none;
@@ -260,6 +308,7 @@
     border-radius: 10px;
     padding: 13px 18px;
     min-width: 158px;
+    scroll-snap-align: start;
     transition: border-color .25s ease, transform .2s ease, background-color .4s ease, box-shadow .25s ease;
   }
   .timeline-step:hover{
@@ -527,6 +576,13 @@
         </div>
         <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
       </summary>
+      <div class="timeline-viewport">
+      <button type="button" class="timeline-nav timeline-nav--prev" aria-label="Cuộn về chặng trước" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <button type="button" class="timeline-nav timeline-nav--next" aria-label="Cuộn tới chặng kế tiếp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
       <div class="timeline-row">
 
         <!-- ===== KHỐI MẪU 1 BƯỚC (copy để thêm bước mới) ===== -->
@@ -571,6 +627,7 @@
           <p class="timeline-step__name">Phần 3</p>
         </a>
 
+      </div>
       </div>
     </details>
 
@@ -724,6 +781,32 @@
 
       window.addEventListener('hashchange', revealTarget);
       window.addEventListener('load', function(){ window.setTimeout(revealTarget, 60); });
+    })();
+
+    // 2 nút mũi tên cho hàng Timeline — bấm để cuộn ngang theo từng cụm.
+    (function(){
+      var row  = document.querySelector('.timeline-row');
+      var prev = document.querySelector('.timeline-nav--prev');
+      var next = document.querySelector('.timeline-nav--next');
+      if(!row || !prev || !next) return;
+
+      function step(){
+        var card = row.querySelector('.timeline-step');
+        var w = card ? card.getBoundingClientRect().width : 180;
+        return Math.max(160, w + 24);
+      }
+      function update(){
+        prev.disabled = row.scrollLeft <= 4;
+        next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+      }
+      prev.addEventListener('click', function(){ row.scrollBy({ left: -step()*2, behavior: 'smooth' }); });
+      next.addEventListener('click', function(){ row.scrollBy({ left:  step()*2, behavior: 'smooth' }); });
+      row.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      // cập nhật lần đầu (sau khi <details> mở)
+      var toggle = document.querySelector('details.timeline-toggle');
+      if(toggle) toggle.addEventListener('toggle', function(){ window.setTimeout(update, 50); });
+      window.setTimeout(update, 60);
     })();
   </script>
 
