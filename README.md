@@ -1,12 +1,12 @@
-# Thư viện — đọc & tải truyện theo chương
+# Thư viện — đọc & tải truyện theo phần
 
 Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. Trang có:
 
-- **2 thẻ thư viện** ở đầu trang: **OurEra** và **High and Higher** (bấm để nhảy thẳng tới
-  bìa truyện thuộc thư viện đó).
-- **Timeline bìa truyện**: mỗi mục là một "bìa" đại diện cho một **phần truyện** (ví dụ
-  `OurEra — Bộ truyện mẫu — Phần 1`). Bấm vào bìa → mở ra danh sách các chương bên trong,
-  mỗi chương có nút tải file Word (.docx).
+- **2 thư viện**: **OurEra** và **High and Higher**. Bấm vào tên thư viện để mở danh sách
+  các **phần** (Phần 1, Phần 2, Phần 3...), mỗi phần có nút tải file Word (.docx).
+- **Timeline**: bấm vào ô "Timeline" ở đầu trang để mở một hàng ngang thể hiện **thứ tự đọc
+  gợi ý** của tác giả (ví dụ: OurEra Phần 1 → High and Higher Phần 1 → OurEra Phần 2 → ...).
+  Bấm vào một bước sẽ mở đúng thư viện và cuộn tới phần đó.
 
 ## Cấu trúc thư mục
 ```
@@ -16,14 +16,14 @@ Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. T
 └── chapters/
     ├── ourera/                  ← truyện thuộc thư viện OurEra
     │   └── bo-truyen-mau/       ← 1 bộ truyện
-    │       └── phan-1/          ← 1 phần trong bộ truyện
-    │           ├── chuong-01.docx
-    │           ├── chuong-02.docx
-    │           └── chuong-03.docx
+    │       ├── phan-1.docx
+    │       ├── phan-2.docx
+    │       └── phan-3.docx
     └── mythren/                 ← truyện thuộc thư viện High and Higher
         └── bo-truyen-mau/
-            └── phan-1/
-                └── chuong-01.docx
+            ├── phan-1.docx
+            ├── phan-2.docx
+            └── phan-3.docx
 ```
 
 ## Cách đưa lên mạng (làm 1 lần)
@@ -35,30 +35,28 @@ Một trang web tĩnh đơn giản, chạy miễn phí trên **GitHub Pages**. T
 
 ## Cách thêm nội dung mới
 
-### 1. Thêm một CHƯƠNG mới vào bìa truyện đã có
-1. Tải file `.docx` lên `chapters/<thư viện>/<bộ-truyện>/<phần>/`.
-2. Mở `index.html`, tìm đúng `<li class="entry" id="...">` của bìa truyện đó.
-3. Trong `<ol class="chapters">`, copy khối `===== KHỐI MẪU 1 CHƯƠNG =====` (một thẻ
-   `<li class="chapter">`), dán **lên trên cùng** danh sách (chương mới nhất ở trên).
-4. Sửa: ngày, tên chương, mô tả, và đường dẫn `href="chapters/..."`.
-5. Cập nhật `cover__meta` ở bìa (số chương · ngày cập nhật).
-6. Commit. Trang sẽ tự cập nhật sau khoảng 1 phút.
+### 1. Thêm một PHẦN mới vào một thư viện đã có
+1. Tải file `.docx` lên `chapters/<thư viện>/<bộ-truyện>/phan-N.docx`.
+2. Mở `index.html`, tìm `<ol class="parts">` của thư viện tương ứng (`OurEra` hoặc
+   `High and Higher`).
+3. Copy khối `===== KHỐI MẪU 1 PHẦN =====` (một thẻ `<li class="part" id="...">`), dán vào
+   cuối (hoặc đúng vị trí mong muốn trong) danh sách.
+4. Sửa:
+   - `id="..."` — đặt tên duy nhất (vd `ourera-bo-A-p4`).
+   - `part__name` — tên phần hiển thị (vd "Phần 4").
+   - `href="chapters/..."` — đường dẫn tới file `.docx` vừa tải lên.
+5. Commit. Trang sẽ tự cập nhật sau khoảng 1 phút.
 
-### 2. Thêm một BÌA TRUYỆN MỚI (một phần truyện mới)
-1. Tạo thư mục `chapters/<thư viện>/<bộ-truyện>/<phần-mới>/` và tải các file `.docx` chương vào.
-2. Trong `index.html`, copy nguyên khối `===== KHỐI MẪU 1 BÌA TRUYỆN =====` (một thẻ
-   `<li class="entry">` chứa `<details class="cover">`), dán **lên trên cùng** `<ol class="timeline">`
-   (bìa mới nhất ở trên).
-3. Sửa:
-   - `id="..."` — đặt tên duy nhất (vd `ourera-bo-A-p2`).
-   - `cover__lib` — tên thư viện hiển thị (`OurEra` hay `High and Higher`).
-   - `cover__title` — tên bộ truyện và phần.
-   - `cover__meta` — số chương · ngày cập nhật.
-   - Danh sách `<li class="chapter">` bên trong (xem mục 1).
+### 2. Thêm/sửa thứ tự đọc trong Timeline
+1. Trong `index.html`, tìm khối `<div class="timeline-row">`.
+2. Mỗi bước là một `<a class="timeline-step" href="#id-cua-phan">`, giữa các bước là
+   `<span class="timeline-arrow">→</span>`.
+3. Copy khối `===== KHỐI MẪU 1 BƯỚC =====` để thêm bước mới, đặt `href="#..."` trỏ tới đúng
+   `id` của phần (đã đặt ở mục 1), và sắp xếp các bước theo đúng thứ tự bạn muốn người đọc đi qua.
 
 ## Tuỳ chỉnh nhanh
 - **Tiêu đề trang ("Thư viện"):** sửa trong `<h1 class="hero__title">`.
-- **Tên 2 thẻ thư viện:** sửa trong khối `<nav class="lib-grid">`.
+- **Tên 2 thư viện:** sửa trong `<h2 class="lib-card__title">`.
 - **Màu sắc:** sửa các biến màu trong phần `:root{ ... }` (vd `--lamp` là màu vàng đèn).
 - **Tiêu đề tab trình duyệt:** sửa trong thẻ `<title>`.
 
