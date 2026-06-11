@@ -466,7 +466,6 @@
           </svg>
           <p class="lib-card__eyebrow">Thế giới thứ nhất</p>
           <h2 class="lib-card__title">OurEra</h2>
-          <p class="lib-card__tagline">Trái Đất — nơi những điều bình thường giấu một phép màu nhỏ.</p>
           <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
         </summary>
         <div class="lib-card__body">
@@ -506,7 +505,6 @@
           </svg>
           <p class="lib-card__eyebrow">Thế giới thứ hai</p>
           <h2 class="lib-card__title">High and Higher</h2>
-          <p class="lib-card__tagline">Mythren — vương quốc trên những tầng trời, nơi phép màu là quy luật.</p>
           <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
         </summary>
         <div class="lib-card__body">
@@ -609,7 +607,7 @@
     function drawAurora(){
       var ac = W*0.5, ay0 = H*0.46;
       // cực quang tím: chính, mạnh dần theo glow
-      var v = 0.13 + glow*0.26;
+      var v = 0.13 + glow*0.17;
       var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
       g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
       g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
@@ -627,7 +625,7 @@
 
       // ngọc lục: nở rộ khi đi sâu
       var bx = W*0.18, by = H*0.9;
-      var tl = 0.06 + glow*0.13;
+      var tl = 0.06 + glow*0.08;
       var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
       g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
       g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');
@@ -637,10 +635,20 @@
       // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình
       if(glow > 0.02){
         var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
-        g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.10)+')');
-        g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.03)+')');
+        g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.06)+')');
+        g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.02)+')');
         g4.addColorStop(1, 'rgba(190,120,235,0)');
         ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);
+      }
+
+      // khi xoay: tối dần ở rìa, giữ trung tâm sáng (vignette)
+      if(glow > 0.02){
+        var cv = Math.min(W,H);
+        var g5 = ctx.createRadialGradient(W*0.5, H*0.46, cv*0.18, W*0.5, H*0.46, Math.max(W,H)*0.72);
+        g5.addColorStop(0, 'rgba(7,8,15,0)');
+        g5.addColorStop(0.55, 'rgba(7,8,15,'+(glow*0.20)+')');
+        g5.addColorStop(1, 'rgba(7,8,15,'+(glow*0.55)+')');
+        ctx.fillStyle = g5; ctx.fillRect(0,0,W,H);
       }
     }
 
@@ -659,12 +667,12 @@
       // tâm cố định. glow = 0 → sao ĐỨNG YÊN (đốm trắng, không đuôi, không trôi).
       // Kéo timeline đủ sâu → glow tăng → sao xoay nhanh dần, đuôi dài dần.
       var cx = W*0.5, cy = H*0.46;
-      if(glow > 0) rot += glow * 0.020;            // chỉ xoay khi thật sự có độ sâu
+      if(glow > 0) rot += glow * 0.014;            // chỉ xoay khi thật sự có độ sâu
 
       var sp = Math.min(1.7, glow * 1.9);
       var spinning = sp > 0.04;
       var trail = sp;
-      var segs = 12;
+      var segs = 6;
 
       // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
       ctx.lineCap = 'round';
@@ -685,7 +693,7 @@
             var a0 = ang - trail*((seg+1)/segs);
             var taper = 1 - f0;
             var alpha = bright * taper * taper;
-            if(alpha < 0.012) continue;
+            if(alpha < 0.018) continue;
             ctx.beginPath();
             ctx.arc(cx, cy, s.radius, a0, a1);
             ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
