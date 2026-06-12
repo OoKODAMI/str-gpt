@@ -1,1148 +1,183 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thư Viện — OurEra &amp; High and Higher</title>
-<script>document.documentElement.classList.add('js');</script>
-<style>
-  :root{
-    --bg-deep:   #07080f;
-    --surface:   #14171f;
-    --surface-2: #1a1e2c40;
-    --border:    rgba(236,228,210,0.10);
-    --border-hi: rgba(233,176,74,0.42);
-
-    /* OurEra — kim sắc */
-    --gold:      #e9b04a;
-    --gold-soft: #f6d79a;
-
-    /* High and Higher — tử sắc */
-    --violet:      #9b8cff;
-    --violet-soft: #d3ccff;
-
-    --text:      #efe8d8;
-    --text-dim:  #a8a292;
-    --text-faint:#726f63;
-
-    --display: "Times New Roman", Times, "Liberation Serif", serif;
-    --body:    "Times New Roman", Times, serif;
-
-    --maxw: 800px;
-  }
-
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
-
-  body{
-    background: var(--bg-deep);
-    color: var(--text);
-    font-family: var(--body);
-    font-size: 18px;
-    line-height: 1.62;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    min-height: 100vh;
-  }
-
-  /* canvas nền tương tác */
-  #cosmos{
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-    display: block;
-  }
-  /* lớp phủ tối nhẹ để chữ luôn rõ */
-  .veil{
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: radial-gradient(120% 90% at 50% 0%, transparent 40%, rgba(7,8,15,0.55) 100%);
-  }
-
-  .wrap{
-    position: relative;
-    max-width: var(--maxw);
-    margin: 0 auto;
-    padding: 0 26px;
-  }
-
-  /* ---------------- HERO ---------------- */
-  .hero{
-    padding: 108px 0 44px;
-    text-align: center;
-  }
-  .hero__kicker{
-    font-size: 13px;
-    letter-spacing: 0.46em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin: 0 0 22px;
-    font-style: italic;
-  }
-  .hero__kicker span{ color: var(--gold); font-style: normal; }
-  .hero__kicker em{ font-style: normal; color: var(--violet); }
-  .hero__title{
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(54px, 13vw, 104px);
-    line-height: 1.02;
-    letter-spacing: 0.02em;
-    margin: 0;
-    color: var(--text);
-    text-shadow: 0 0 40px rgba(233,176,74,0.20), 0 0 80px rgba(155,140,255,0.12);
-  }
-
-  .ornament{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin: 38px auto 0;
-    max-width: 280px;
-  }
-  .ornament__line{
-    flex: 1; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-hi));
-  }
-  .ornament__line--right{ background: linear-gradient(90deg, var(--border-hi), transparent); }
-  .ornament__gem{
-    width: 9px; height: 9px; flex: none;
-    background: linear-gradient(135deg, var(--gold), var(--violet));
-    transform: rotate(45deg);
-    border-radius: 2px;
-    box-shadow: 0 0 14px rgba(233,176,74,0.4);
-  }
-
-  /* ===== Màn mở đầu: tiêu đề hiện ra mượt khi vào trang ===== */
-  @media (prefers-reduced-motion: no-preference){
-    .hero__kicker{ animation: heroFade 1s ease both 0.2s; }
-    .hero__title{ animation: heroTitle 1.35s cubic-bezier(.2,.7,.2,1) both 0.42s; }
-    .ornament{ animation: heroFade 1.1s ease both 0.95s; }
-    .veil{ animation: veilFade 1.6s ease both; }
-    @keyframes heroFade{
-      from{ opacity: 0; transform: translateY(12px); }
-      to{ opacity: 1; transform: translateY(0); }
-    }
-    @keyframes heroTitle{
-      0%{ opacity: 0; transform: translateY(30px) scale(.95); filter: blur(12px); letter-spacing: 0.2em; }
-      55%{ filter: blur(0); }
-      100%{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); letter-spacing: 0.02em; }
-    }
-    @keyframes veilFade{ from{ opacity: 0; } to{ opacity: 1; } }
-  }
-
-  summary{ cursor: pointer; list-style: none; user-select: none; }
-  summary::-webkit-details-marker{ display:none; }
-  .summary__chevron{
-    flex: none; width: 22px; height: 22px;
-    color: var(--text-faint);
-    transition: transform .3s ease;
-  }
-  details[open] > summary .summary__chevron{ transform: rotate(90deg); }
-
-  /* ---------------- TIMELINE ---------------- */
-  details.timeline-toggle{
-    position: relative;
-    z-index: 1;
-    background: linear-gradient(180deg, rgba(20,23,31,0.72), rgba(26,30,44,0.28));
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    margin: 54px 0 22px;
-    backdrop-filter: blur(6px);
-    transition: border-color .3s ease;
-  }
-  details.timeline-toggle[open]{ border-color: var(--border-hi); }
-  /* khi bật chú thích ? → nâng khung lên trên thẻ thư viện */
-  details.timeline-toggle:has(.tl-help:hover),
-  details.timeline-toggle:has(.tl-help.is-open),
-  details.timeline-toggle:has(.tl-help:focus-within){ z-index: 50; }
-
-  .timeline-toggle__summary{
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 24px 26px;
-    transition: color .25s ease;
-  }
-  .timeline-toggle__summary:hover{ color: var(--gold); }
-  .summary__right{ display: flex; align-items: center; gap: 14px; flex: none; }
-  .tl-help__pop strong{ color: var(--gold-soft); font-weight: 700; }
-  .timeline-toggle__eyebrow{
-    font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;
-    color: var(--gold); margin: 0 0 6px; font-style: italic;
-  }
-  .timeline-toggle__title{
-    font-family: var(--display); font-weight: 700;
-    font-size: clamp(24px, 5vw, 32px);
-    margin: 0 0 5px; letter-spacing: 0.01em; color: var(--text);
-  }
-  .timeline-toggle__desc{ font-size: 15px; color: var(--text-faint); margin: 0; font-style: italic; }
-
-  .timeline-viewport{ position: relative; display:flex; align-items:center; gap:6px; padding:0 8px; }
-
-  /* dải nền chuyển sắc: dịu → cosmic */
-  .timeline-track{
-    position: absolute;
-    left: 58px; right: 58px;
-    top: 50%;
-    height: 2px;
-    transform: translateY(-50%);
-    background: linear-gradient(90deg,
-      rgba(168,162,146,0.22) 0%,
-      rgba(233,176,74,0.30) 38%,
-      rgba(155,140,255,0.55) 72%,
-      rgba(207,200,255,0.85) 100%);
-    z-index: 0;
-    border-radius: 999px;
-    pointer-events: none;
-  }
-
-  .timeline-row{
-    position: relative;
-    z-index: 1;
-    order: 1;
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex; align-items: stretch; gap: 0;
-    padding: 8px 6px 30px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-radius: 0 0 18px 18px;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
-    scrollbar-color: var(--border-hi) transparent;
-    scrollbar-width: thin;
-  }
-  .timeline-row::-webkit-scrollbar{ height: 12px; }
-  .timeline-row::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); border-radius:999px; margin:0 24px; }
-  .timeline-row::-webkit-scrollbar-thumb{
-    background: linear-gradient(90deg, var(--gold), var(--violet));
-    border-radius:999px; border:3px solid transparent; background-clip: padding-box;
-  }
-
-  .timeline-nav{
-    position: relative;
-    flex: none;
-    width: 42px; height: 42px;
-    display: flex; align-items:center; justify-content:center;
-    border: 1px solid var(--border-hi); border-radius: 999px;
-    background: rgba(7,8,15,0.94); color: var(--text);
-    cursor: pointer; z-index: 3;
-    transition: background-color .2s ease, transform .2s ease, opacity .2s ease;
-    box-shadow: 0 6px 18px -8px rgba(0,0,0,0.6);
-  }
-  .timeline-nav:hover{ background: var(--gold); color: var(--bg-deep); transform: scale(1.06); }
-  .timeline-nav[disabled]{ opacity: 0.25; pointer-events: none; }
-  .timeline-nav--prev{ order: 0; }
-  .timeline-nav--next{ order: 2; }
-  .timeline-nav svg{ width: 18px; height: 18px; }
-
-  /* ===== HÀNH TRÌNH 2 TUYẾN (Mythren ‖ Trái Đất) — fantasy tăng dần theo --t ===== */
-  .stage{
-    --t: 0;
-    --top-color: var(--violet);
-    --bot-color: var(--gold);
-    position: relative;
-    flex: none;
-    scroll-snap-align: start;
-    display: flex; flex-direction: column;
-    min-width: 226px;
-    padding: 6px 0 4px;
-  }
-  .stage--wide{ min-width: 320px; }
-  .stage__head{
-    display: flex; align-items: baseline; gap: 9px;
-    padding: 0 16px; min-height: 3.4em;
-  }
-  .stage__num{
-    font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1; flex: none;
-    color: color-mix(in srgb, var(--violet) calc(26% + var(--t)*64%), var(--text-faint));
-    text-shadow: 0 0 calc(var(--t)*14px) color-mix(in srgb, var(--violet) calc(var(--t)*80%), transparent);
-  }
-  .stage__name{
-    font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--text-dim); line-height: 1.32; text-wrap: balance;
-  }
-  .stage__tag{
-    margin: 0 16px 2px; font-size: 11px; font-style: italic; min-height: 1.4em;
-    color: color-mix(in srgb, var(--gold) calc(var(--t)*70%), var(--text-faint));
-  }
-  .stage__tag--sync{ color: var(--violet-soft); font-style: normal; letter-spacing: 0.06em; }
-  .stage__tag--end{ color: var(--gold-soft); }
-
-  .stage__lanes{
-    position: relative;
-    display: flex; flex-direction: column; gap: 26px;
-    padding: 14px 16px 8px;
-  }
-
-  .lane{ position: relative; min-height: 78px; display: flex; gap: 8px; }
-  /* đường tuyến chạy ngang qua giữa mỗi làn (nối liền giữa các giai đoạn) */
-  .lane::before{
-    content:""; position: absolute; top: 50%; left: -16px; right: -16px; height: 2px;
-    transform: translateY(-50%); z-index: 0; border-radius: 999px;
-  }
-  .lane--top::before{ background: color-mix(in srgb, var(--top-color) calc(28% + var(--t)*56%), transparent); }
-  .lane--bot::before{ background: color-mix(in srgb, var(--bot-color) calc(28% + var(--t)*56%), transparent); }
-  .lane--empty::before{ display: none; }   /* tuyến đã kết thúc → không kẻ */
-
-  .node{
-    position: relative; z-index: 1; flex: 1 1 0; min-width: 0;
-    display: flex; flex-direction: column; justify-content: center;
-    border-radius: 11px; padding: 12px 14px 13px;
-    background:
-      radial-gradient(120% 150% at 50% -20%, color-mix(in srgb, var(--lane-color) calc(var(--t)*24%), transparent), transparent 70%),
-      rgba(15,18,26, calc(0.6 + var(--t)*0.16));
-    border: 1px solid color-mix(in srgb, var(--lane-color) calc(16% + var(--t)*34%), var(--border));
-    border-left: 2px solid var(--lane-color);
-    box-shadow: 0 calc(2px + var(--t)*12px) calc(8px + var(--t)*22px) calc(-6px - var(--t)*6px)
-                color-mix(in srgb, var(--lane-color) calc(var(--t)*60%), transparent);
-    transition: transform .2s ease, box-shadow .3s ease;
-  }
-  .lane--top .node{ --lane-color: var(--top-color); }
-  .lane--bot .node{ --lane-color: var(--bot-color); }
-  .node:hover{ transform: translateY(-2px); }
-  /* nút tải .docx ngay trên ô */
-  .node__dl{
-    margin-top: 10px; align-self: flex-start;
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11.5px; letter-spacing: 0.03em; font-style: normal;
-    padding: 6px 12px; border-radius: 999px; text-decoration: none; white-space: nowrap;
-    color: var(--text);
-    background: color-mix(in srgb, var(--lane-color) 18%, transparent);
-    border: 1px solid color-mix(in srgb, var(--lane-color) 48%, transparent);
-    transition: background-color .18s ease, color .18s ease, transform .18s ease;
-  }
-  .node{ cursor: pointer; }
-  .node__dl:hover{ background: var(--lane-color); color: var(--bg-deep); transform: translateY(-1px); }
-  .node__dl svg{ width: 13px; height: 13px; }
-  /* nút ⋯ hé lộ trên mỗi ô */
-  .node__peek{
-    position: absolute; top: 9px; right: 10px;
-    width: 30px; height: 22px; padding: 0;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 16px; line-height: 1; letter-spacing: 1px;
-    color: var(--lane-color);
-    background: color-mix(in srgb, var(--lane-color) 12%, rgba(7,8,15,0.5));
-    border: 1px solid color-mix(in srgb, var(--lane-color) 36%, transparent);
-    border-radius: 999px; cursor: pointer;
-    transition: background-color .18s ease, color .18s ease, transform .18s ease;
-  }
-  .node__peek:hover{ background: var(--lane-color); color: var(--bg-deep); transform: translateY(-1px); }
-
-  /* ===== Modal hé lộ ===== */
-  .peek{
-    position: fixed; inset: 0; z-index: 120;
-    display: flex; align-items: center; justify-content: center; padding: 22px;
-    background: rgba(4,5,10,0.74); backdrop-filter: blur(6px);
-    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s;
-  }
-  .peek.is-open{ opacity: 1; visibility: visible; }
-  .peek__card{
-    --pc: var(--gold);
-    width: min(440px, 100%); max-height: 88vh; overflow: auto;
-    background: linear-gradient(180deg, rgba(20,23,31,0.99), rgba(26,30,44,0.97));
-    border: 1px solid color-mix(in srgb, var(--pc) 40%, var(--border-hi));
-    border-radius: 18px; box-shadow: 0 40px 100px -30px #000;
-    position: relative;
-    transform: translateY(16px) scale(.98); transition: transform .3s cubic-bezier(.2,.7,.2,1);
-  }
-  .peek.is-open .peek__card{ transform: none; }
-  .peek__close{
-    position: absolute; top: 12px; right: 12px; z-index: 2;
-    width: 32px; height: 32px; border-radius: 999px;
-    background: rgba(7,8,15,0.6); border: 1px solid var(--border-hi);
-    color: var(--text-dim); cursor: pointer; font-size: 15px;
-    display: flex; align-items: center; justify-content: center;
-    transition: background-color .18s ease, color .18s ease;
-  }
-  .peek__close:hover{ background: var(--pc); color: var(--bg-deep); }
-  .peek__img{
-    position: relative; width: 100%; aspect-ratio: 16 / 10;
-    border-radius: 18px 18px 0 0; overflow: hidden;
-    background: rgba(10,12,20,0.6);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .peek__img img{ width: 100%; height: 100%; object-fit: cover; display: none; }
-  .peek__img.has-img img{ display: block; }
-  .peek__imgph{
-    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--text-faint);
-    border: 1px dashed var(--border-hi); border-radius: 999px; padding: 7px 16px;
-  }
-  .peek__img.has-img .peek__imgph{ display: none; }
-  .peek__body{ padding: 18px 22px 22px; }
-  .peek__cap{
-    margin: 0 0 14px; font-size: 13px; font-style: italic; color: var(--text-dim);
-    text-align: center;
-  }
-  .peek__series{
-    margin: 0 0 4px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--pc); font-style: italic;
-  }
-  .peek__title{
-    margin: 0 0 10px; font-family: var(--display); font-weight: 700; font-size: 24px;
-    color: var(--text);
-  }
-  .peek__chapters{
-    display: inline-block; margin: 0 0 16px;
-    font-size: 12.5px; color: var(--text);
-    background: color-mix(in srgb, var(--pc) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--pc) 40%, transparent);
-    border-radius: 999px; padding: 4px 12px;
-  }
-  .peek__teaserwrap{ border-top: 1px solid var(--border); padding-top: 14px; }
-  .peek__label{
-    margin: 0 0 6px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--text-faint);
-  }
-  .peek__teaser{
-    margin: 0 0 12px; font-size: 14.5px; line-height: 1.7; font-style: italic;
-    color: var(--text-dim); border-left: 2px solid var(--pc); padding-left: 12px;
-    text-wrap: pretty;
-  }
-  .peek__reroll{
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12.5px; color: var(--text-dim); cursor: pointer;
-    background: transparent; border: 1px solid var(--border-hi); border-radius: 999px;
-    padding: 6px 13px; transition: border-color .18s ease, color .18s ease;
-  }
-  .peek__reroll:hover{ color: var(--text); border-color: var(--pc); }
-  .peek__dl{
-    display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
-    padding: 11px 20px; border-radius: 999px; text-decoration: none;
-    font-size: 14px; font-weight: 600; letter-spacing: 0.01em;
-    background: var(--pc); color: var(--bg-deep);
-    border: 1px solid var(--pc);
-    transition: transform .18s ease, filter .18s ease;
-  }
-  .peek__dl:hover{ transform: translateY(-1px); filter: brightness(1.08); }
-  .peek__dl svg{ width: 15px; height: 15px; }
-  .node__series{
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--lane-color); margin: 0 0 4px; font-style: italic;
-  }
-  .node__title{
-    font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: 0.01em;
-    margin: 0; color: var(--text); line-height: 1.2; text-wrap: balance;
-    text-shadow: 0 0 calc(var(--t)*14px) color-mix(in srgb, var(--lane-color) calc(var(--t)*80%), transparent);
-  }
-
-  /* điểm Sync — nối dọc hai tuyến */
-  .sync{
-    position: absolute; left: 50%; top: 30px; bottom: 30px; width: 2px;
-    transform: translateX(-50%); z-index: 0;
-    background: linear-gradient(180deg, var(--top-color), var(--bot-color));
-    opacity: calc(0.45 + var(--t)*0.45);
-  }
-  .sync::before, .sync::after{
-    content:""; position: absolute; left: 50%; width: 9px; height: 9px;
-    transform: translateX(-50%) rotate(45deg); border-radius: 2px;
-  }
-  .sync::before{ top: -4px; background: var(--violet-soft); box-shadow: 0 0 10px var(--violet); }
-  .sync::after{ bottom: -4px; background: var(--gold-soft); box-shadow: 0 0 10px var(--gold); }
-
-  /* ngoại truyện — có thể bỏ qua */
-  .stage__extra{ display: flex; flex-direction: column; gap: 6px; padding: 8px 16px 0; }
-  .extra{
-    display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
-    font-size: 12px; color: var(--text-dim); font-style: italic; text-decoration: none;
-    border: 1px dashed var(--border-hi); border-radius: 999px; padding: 6px 13px;
-    background: rgba(15,18,26,0.45); cursor: pointer; font-family: inherit;
-    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
-  }
-  .extra::before{ content: "✦"; font-size: 10px; color: var(--gold); font-style: normal; }
-  .extra:hover{ color: var(--text); border-color: var(--gold); background: rgba(233,176,74,0.08); }
-  .extra svg{ width: 12px; height: 12px; margin-left: 2px; opacity: .85; }
-
-  /* nút ? hướng dẫn */
-  .tl-help{
-    position: relative; flex: none;
-    width: 26px; height: 26px; border-radius: 999px;
-    border: 1px solid var(--border-hi); background: rgba(7,8,15,0.6);
-    color: var(--gold); font-family: var(--display); font-weight: 700; font-size: 15px;
-    display: flex; align-items: center; justify-content: center; cursor: help;
-    transition: background-color .2s ease, color .2s ease;
-  }
-  .tl-help:hover{ background: var(--gold); color: var(--bg-deep); }
-  .tl-help__pop{
-    position: absolute; top: 36px; right: -8px; width: 318px; z-index: 30;
-    background: linear-gradient(180deg, rgba(20,23,31,0.99), rgba(26,30,44,0.97));
-    border: 1px solid var(--border-hi); border-radius: 14px; padding: 16px 18px;
-    box-shadow: 0 26px 64px -22px rgba(0,0,0,0.85);
-    opacity: 0; visibility: hidden; transform: translateY(-6px);
-    transition: transform .2s ease;
-    text-align: left; cursor: default;
-  }
-  .tl-help:hover .tl-help__pop,
-  .tl-help:focus-within .tl-help__pop,
-  .tl-help.is-open .tl-help__pop{ opacity: 1; visibility: visible; transform: translateY(0); }
-  .tl-help__pop h4{ font-family: var(--display); color: var(--text); margin: 0 0 9px; font-size: 16px; font-weight: 700; }
-  .tl-help__pop p{ margin: 0 0 9px; font-size: 13px; line-height: 1.62; color: var(--text-dim); font-style: normal; }
-  .tl-help__pop p:last-child{ margin-bottom: 0; }
-  .tl-help__row{ display: flex; align-items: center; gap: 9px; margin: 7px 0; font-size: 12.5px; color: var(--text-dim); }
-  .tl-help__sw{ width: 22px; height: 3px; border-radius: 2px; flex: none; }
-  .tl-help__dot{ flex: none; }
-
-  /* ---------------- 2 THƯ VIỆN ---------------- */
-  .lib-grid{
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-    align-items: start; margin: 0 0 60px;
-  }
-  details.lib-card{
-    --accent: var(--gold); --accent-soft: var(--gold-soft);
-    position: relative;
-    background: linear-gradient(180deg, rgba(20,23,31,0.78), rgba(26,30,44,0.30));
-    border: 1px solid var(--border); border-radius: 18px;
-    overflow: hidden;
-    backdrop-filter: blur(6px);
-    transition: border-color .3s ease, box-shadow .3s ease;
-  }
-  details.lib-card[open]{
-    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-hi));
-    box-shadow: 0 20px 46px -30px var(--accent);
-  }
-  details.lib-card--mythren{ --accent: var(--violet); --accent-soft: var(--violet-soft); }
-  details.lib-card::before{
-    content:""; position:absolute; top:0; left:0; right:0; height:2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity:.85;
-  }
-
-  .lib-card__summary{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:11px; text-align:center; padding: 34px 22px 26px;
-    transition: color .25s ease;
-  }
-  .lib-card__summary:hover{ color: var(--accent); }
-  .lib-card__icon{ width:36px; height:36px; color: var(--accent); opacity:.92; }
-  .lib-card__eyebrow{
-    font-size:12px; letter-spacing:0.3em; text-transform:uppercase;
-    color: var(--accent); margin:0; font-style: italic;
-  }
-  .lib-card__title{
-    font-family: var(--display); font-weight:700;
-    font-size: clamp(26px, 5.4vw, 36px); letter-spacing:0.02em; margin:0; line-height:1.16;
-  }
-  .lib-card__tagline{
-    font-style: italic; font-size:16px; color: var(--text-dim); margin:0; max-width:30ch;
-  }
-  .lib-card__summary .summary__chevron{ margin-top:6px; color: var(--text-faint); }
-
-  .lib-card__body{
-    padding: 4px 20px 20px; border-top: 1px solid var(--border); margin: 0 20px;
-  }
-  .parts{ list-style:none; margin:0; padding:0; }
-  .part{
-    display:flex; align-items:center; flex-wrap:wrap; gap:10px 16px;
-    border-top: 1px solid var(--border); padding: 18px 6px; border-radius:12px;
-    transition: background-color .4s ease, box-shadow .4s ease;
-    scroll-margin-top: 28px;
-  }
-  .part:first-child{ border-top:none; padding-top:20px; }
-  .part__num{
-    flex:none; font-family: var(--display); font-weight:700; font-size:26px;
-    color: var(--text-faint); min-width:1.6em; text-align:center;
-  }
-  .part__main{ flex:1 1 9em; min-width:0; }
-  .part__name{
-    font-family: var(--display); font-weight:700;
-    font-size: clamp(18px, 4vw, 21px); letter-spacing:0.01em; margin:0; color: var(--text);
-    text-wrap: pretty; line-height:1.3;
-  }
-
-  .part__download{
-    flex:none; margin-left:auto; display:inline-flex; align-items:center; gap:9px;
-    font-family: var(--body); font-size:15px; font-weight:700;
-    color: var(--bg-deep); background: var(--accent, var(--gold));
-    text-decoration:none; padding:10px 18px; border-radius:999px;
-    transition: background .25s ease, transform .15s ease, box-shadow .25s ease;
-  }
-  .part__download:hover{
-    background: var(--accent-soft, var(--gold-soft));
-    box-shadow: 0 6px 18px -6px var(--accent, var(--gold));
-  }
-  .part__download:active{ transform: translateY(1px); }
-  .part__download svg{ width:15px; height:15px; }
-
-  details.lib-card.is-target{
-    animation: cardPulse 2.2s ease;
-  }
-  @keyframes cardPulse{
-    0%, 100%{ box-shadow: 0 0 0 0 transparent; }
-    18%{ box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 60%, transparent), 0 22px 60px -24px var(--accent); }
-  }
-  .part.is-target{
-    background-color: rgba(233,176,74,0.10);
-    box-shadow: inset 3px 0 0 0 var(--accent, var(--gold));
-  }
-
-  footer{
-    border-top: 1px solid var(--border);
-    padding: 40px 0 70px; text-align:center;
-    color: var(--text-faint); font-size:15px; line-height:1.85;
-  }
-  footer .footer__brand{
-    font-family: var(--display); letter-spacing:0.2em; color: var(--text-dim);
-    font-size:14px; text-transform:uppercase;
-  }
-  footer a{ color: var(--text-dim); }
-  .footer__links{
-    display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 22px;
-    flex-wrap: wrap;
-  }
-  .footer__links a{
-    width: 44px; height: 44px; border-radius: 999px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border-hi); color: var(--text-dim);
-    background: rgba(15,18,26,0.5);
-    transition: background-color .2s ease, color .2s ease, transform .2s ease, border-color .2s ease;
-  }
-  .footer__links a:hover{
-    background: var(--gold); color: var(--bg-deep);
-    border-color: var(--gold); transform: translateY(-2px);
-  }
-  .footer__links svg{ width: 19px; height: 19px; }
-  /* Gmail dạng chữ — hiện địa chỉ để dễ đọc/copy */
-  .footer__mail{
-    width: auto !important; height: auto !important; border-radius: 999px;
-    gap: 8px; padding: 9px 16px; font-size: 14px; letter-spacing: 0.01em;
-  }
-  .footer__mail svg{ width: 16px; height: 16px; }
-
-  a:focus-visible, summary:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:3px; border-radius:6px; }
-
-  @media (prefers-reduced-motion: reduce){
-    details.timeline-toggle, details.lib-card, .stage, .node, .tl-help, .part__download, .part, .summary__chevron{ transition:none; }
-  }
-  @media (max-width:560px){ .lib-grid{ grid-template-columns:1fr; } }
-  @media (max-width:480px){
-    .hero{ padding: 76px 0 32px; }
-    .timeline-toggle__summary, .lib-card__body{ padding-left:16px; padding-right:16px; }
-    .lib-card__body{ margin:0 14px; }
-    .part{ flex-wrap:wrap; }
-    .part__download{ margin-left: calc(1.6em + 16px); }
-  }
-</style>
-</head>
-
-<body>
-
-  <canvas id="cosmos" aria-hidden="true"></canvas>
-  <div class="veil" aria-hidden="true"></div>
-
-  <div class="wrap">
-
-    <header class="hero">
-      <p class="hero__kicker"><span>OurEra</span> &amp; <em>High and Higher</em></p>
-      <h1 class="hero__title">Thư Viện</h1>
-      <div class="ornament" aria-hidden="true">
-        <span class="ornament__line"></span>
-        <span class="ornament__gem"></span>
-        <span class="ornament__line ornament__line--right"></span>
-      </div>
-    </header>
-
-    <details class="timeline-toggle">
-      <summary class="timeline-toggle__summary">
-        <div>
-          <p class="timeline-toggle__title">Hành Trình</p>
-        </div>
-        <div class="summary__right">
-          <span class="tl-help" tabindex="0" role="button" aria-label="Hướng dẫn đọc">?<span class="tl-help__pop" role="tooltip">
-              <h4>Cách đọc</h4>
-              <p>Hai tuyến chạy <strong>song song</strong> theo từng Giai đoạn. Trong một giai đoạn, bạn có thể đọc <strong>tự do</strong> thứ tự hai tuyến.</p>
-              <p>Mỗi ô có nút <strong>Tải .docx</strong>; bấm <strong>⋯</strong> để xem ảnh minh hoạ, số chương và đoạn hé lộ.</p>
-              <div class="tl-help__row"><span class="tl-help__sw" style="background:var(--violet)"></span> Tuyến Mythren — hàng trên</div>
-              <div class="tl-help__row"><span class="tl-help__sw" style="background:var(--gold)"></span> Tuyến Trái Đất — hàng dưới</div>
-              <p>Đến <strong>Điểm Sync</strong> (◆) hai tuyến giao nhau — đọc đúng thứ tự để khớp mạch truyện.</p>
-              <div class="tl-help__row"><span class="tl-help__dot">✦</span> Ngoại truyện (viền nét đứt) <strong>có thể bỏ qua</strong> — bấm để tải khi rảnh.</div>
-              <p>Cứ thế đọc lần lượt từ Giai đoạn 1 → 8.</p>
-            </span></span>
-          <svg class="summary__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-        </div>
-      </summary>
-      <div class="timeline-viewport">
-        <span class="timeline-track" aria-hidden="true"></span>
-        <button type="button" class="timeline-nav timeline-nav--prev" aria-label="Cuộn về chặng trước" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
-        </button>
-        <button type="button" class="timeline-nav timeline-nav--next" aria-label="Cuộn tới chặng kế tiếp">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-        </button>
-        <div class="timeline-row">
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">01</span><span class="stage__name">Entry Point</span></div>
-            <p class="stage__tag">Song song tự do</p>
-            <div class="stage__lanes">
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 1</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-1.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Bộ Trái Đất</p><button class="node__peek" type="button" data-peek="chapters/ourera/bo-trai-dat.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">02</span><span class="stage__name">Song song tự do</span></div>
-            <p class="stage__tag">Song song tự do</p>
-            <div class="stage__lanes">
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 2</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-2.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Liglig · S1</p><button class="node__peek" type="button" data-peek="chapters/ourera/liglig-s1.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">03</span><span class="stage__name">Long &amp; Hoa khởi động</span></div>
-            <p class="stage__tag">Song song</p>
-            <div class="stage__lanes">
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 3</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-3.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Long &amp; Hoa · S1</p><button class="node__peek" type="button" data-peek="chapters/ourera/long-hoa-s1.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-            <div class="stage__extra">
-              <button class="extra" type="button" data-peek="chapters/ourera/ngoai-truyen/fiona.docx">Ngoại truyện Fiona</button>
-              <button class="extra" type="button" data-peek="chapters/ourera/ngoai-truyen/vanvande.docx">Ngoại truyện Vanvande</button>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">04</span><span class="stage__name">Điểm Sync 1</span></div>
-            <p class="stage__tag stage__tag--sync">◆ Điểm Sync</p>
-            <div class="stage__lanes">
-              <span class="sync" aria-hidden="true"></span>
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 4</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-4.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Long &amp; Hoa · S2</p><button class="node__peek" type="button" data-peek="chapters/ourera/long-hoa-s2.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">05</span><span class="stage__name">Điểm Sync 2</span></div>
-            <p class="stage__tag stage__tag--sync">◆ Điểm Sync</p>
-            <div class="stage__lanes">
-              <span class="sync" aria-hidden="true"></span>
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 5</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-5.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Long &amp; Hoa · S3</p><button class="node__peek" type="button" data-peek="chapters/ourera/long-hoa-s3.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">06</span><span class="stage__name">Mythren kết thúc</span></div>
-            <p class="stage__tag stage__tag--end">Khép tuyến Mythren</p>
-            <div class="stage__lanes">
-              <div class="lane lane--top"><div class="node"><p class="node__series">Mythren</p><p class="node__title">Season 6</p><button class="node__peek" type="button" data-peek="chapters/mythren/season-6.docx" aria-label="Hé lộ">⋯</button></div></div>
-              <div class="lane lane--bot lane--empty"></div>
-            </div>
-            <div class="stage__extra">
-              <button class="extra" type="button" data-peek="chapters/mythren/ngoai-truyen/lucard.docx">Ngoại truyện · Quá khứ Lucard</button>
-            </div>
-          </div>
-
-          <div class="stage">
-            <div class="stage__head"><span class="stage__num">07</span><span class="stage__name">Liglig Season 2</span></div>
-            <p class="stage__tag"></p>
-            <div class="stage__lanes">
-              <div class="lane lane--top lane--empty"></div>
-              <div class="lane lane--bot"><div class="node"><p class="node__series">Trái Đất</p><p class="node__title">Liglig · S2</p><button class="node__peek" type="button" data-peek="chapters/ourera/liglig-s2.docx" aria-label="Hé lộ">⋯</button></div></div>
-            </div>
-          </div>
-
-          <div class="stage stage--wide">
-            <div class="stage__head"><span class="stage__num">08</span><span class="stage__name">Giải đáp</span></div>
-            <p class="stage__tag stage__tag--end">Khép lại</p>
-            <div class="stage__lanes">
-              <div class="lane lane--top lane--empty"></div>
-              <div class="lane lane--bot">
-                <div class="node"><p class="node__series">Bộ Yue</p><p class="node__title">Quá khứ</p><button class="node__peek" type="button" data-peek="chapters/ourera/yue-qua-khu.docx" aria-label="Hé lộ">⋯</button></div>
-                <div class="node"><p class="node__series">Bộ Yue</p><p class="node__title">Hiện tại</p><button class="node__peek" type="button" data-peek="chapters/ourera/yue-hien-tai.docx" aria-label="Hé lộ">⋯</button></div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </details>
-
-
-    <footer>
-      <p class="footer__brand">2oKODAMI</p>
-      <div class="footer__links">
-        <a href="https://www.facebook.com/Tinedatt001/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 13.5h2.5l1-4H14V7.5c0-1.03 0-2 2-2h1.5V2.14c-.33-.04-1.55-.14-2.84-.14C11.93 2 10 3.66 10 6.7v2.8H7v4h3V22h4z"></path></svg>
-        </a>
-        <a class="footer__mail" href="/cdn-cgi/l/email-protection#05716c606b616471736137373537456268646c692b666a68" aria-label="Gmail" title="Gửi email">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg>
-          <span class="__cf_email__" data-cfemail="eb9f828e858f8a9f9d8fd9d9dbd9ab8c868a8287c5888486">[email&#160;protected]</span>
-        </a>
-      </div>
-      <p>Cảm ơn bạn đã ghé thăm hai thế giới này.<br>
-      Trang được lưu trữ miễn phí trên GitHub Pages.</p>
-    </footer>
-
-    <div class="peek" aria-hidden="true">
-      <div class="peek__card" role="dialog" aria-modal="true" aria-label="Hé lộ">
-        <button class="peek__close" type="button" aria-label="Đóng">✕</button>
-        <div class="peek__img"><img alt=""><span class="peek__imgph">Ảnh minh hoạ</span></div>
-        <div class="peek__body">
-          <p class="peek__cap"></p>
-          <p class="peek__series"></p>
-          <h3 class="peek__title"></h3>
-          <p class="peek__chapters"></p>
-          <div class="peek__teaserwrap">
-            <p class="peek__label">Đoạn hé lộ</p>
-            <p class="peek__teaser"></p>
-            <button class="peek__reroll" type="button">↻ Đoạn khác</button>
-          </div>
-          <a class="peek__dl" href="#" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg>Tải .docx</a>
-        </div>
-      </div>
+  <meta charset="utf-8">
+  <title>Thư Viện — OurEra &amp; High and Higher</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #faf9f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    #__bundler_loading { position: fixed; bottom: 20px; right: 20px; font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #666; background: #fff; padding: 8px 14px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); z-index: 10000; }
+    #__bundler_thumbnail { position: fixed; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #faf9f5; z-index: 9999; }
+    #__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }
+    #__bundler_placeholder { color: #999; font-size: 14px; }
+  </style>
+  <noscript>
+    <style>#__bundler_loading { display: none; }</style>
+    <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
+      This page requires JavaScript to display.
     </div>
+  </noscript>
+</head>
+<body>
+  <div id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="#07080f"></rect>
+    <circle cx="50" cy="50" r="22" fill="none" stroke="#e9b04a" stroke-width="1.2" opacity="0.8"></circle>
+    <circle cx="50" cy="50" r="32" fill="none" stroke="#9b8cff" stroke-width="0.8" opacity="0.5"></circle>
+    <circle cx="50" cy="28" r="3" fill="#e9b04a"></circle>
+    <circle cx="72" cy="50" r="2.2" fill="#9b8cff"></circle>
+    <text x="50" y="74" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#ece4d2">Thư Viện</text>
+  </svg>
+</div>
+  <div id="__bundler_loading">Unpacking...</div>
 
-  </div>
+  <script>
+    
+document.addEventListener('DOMContentLoaded', async function() {
+  const loading = document.getElementById('__bundler_loading');
+  function setStatus(msg) { if (loading) loading.textContent = msg; }
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  /* Cường độ vũ trụ: 0 = đầu timeline (đứng yên) → 1 = cuối timeline (xoay nhanh).
-     Cập nhật khi cuộn timeline; nền canvas đọc để quyết định tốc độ xoay & đuôi sao. */
-  var cosmicDepth = 0;
+  // Error sink persists across replaceWith since it's on window, not the DOM.
+  window.addEventListener('error', function(e) {
+    var p = document.body || document.documentElement;
+    var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
+    d.id = '__bundler_err';
+    d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';
+    d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
+      '[bundle] ' + (e.message || e.type) +
+      (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
+  }, true);
 
-  /* ============ NỀN VŨ TRỤ TƯƠNG TÁC ============ */
-  (function(){
-    var canvas = document.getElementById('cosmos');
-    if(!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var glow = 0; // bản làm mượt của cosmicDepth
-
-    var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 1.5);
-    var stars = [], rot = 0;
-
-    function resize(){
-      W = canvas.clientWidth = window.innerWidth;
-      H = canvas.clientHeight = window.innerHeight;
-      canvas.width = W * DPR; canvas.height = H * DPR;
-      ctx.setTransform(DPR,0,0,DPR,0,0);
-      build();
+  try {
+    const manifestEl = document.querySelector('script[type="__bundler/manifest"]');
+    const templateEl = document.querySelector('script[type="__bundler/template"]');
+    if (!manifestEl || !templateEl) {
+      setStatus('Error: missing bundle data');
+      console.error('[bundler] Missing script tags — manifestEl:', !!manifestEl, 'templateEl:', !!templateEl);
+      return;
     }
 
-    function build(){
-      var maxR = Math.hypot(W, H) * 0.82;
-      stars = [];
-      var count = Math.round((W*H)/3200);
-      for(var i=0;i<count;i++){
-        var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm
-        var tint = Math.random();
-        var col = '255,255,255';
-        if(tint > 0.93) col = '245,210,138';        // đốm kim sắc
-        else if(tint > 0.85) col = '210,200,255';    // đốm tím
-        else if(tint > 0.74) col = '175,222,255';    // trắng xanh
-        stars.push({
-          radius: radius,
-          ang: Math.random()*Math.PI*2,
-          w: 0.5 + Math.random()*1.5,
-          base: 0.3 + Math.random()*0.6,
-          col: col,
-          spin: 1 + (Math.random()-0.5)*0.10,        // biến thiên nhẹ cho tự nhiên
-          tw: Math.random()*Math.PI*2,
-          tws: 0.6 + Math.random()*1.4
-        });
-      }
-    }
+    const manifest = JSON.parse(manifestEl.textContent);
+    let template = JSON.parse(templateEl.textContent);
 
-    // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ
-    function drawAurora(){
-      var ac = W*0.5, ay0 = H*0.46;
-      // cực quang tím: chính, mạnh dần theo glow
-      var v = 0.13 + glow*0.17;
-      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));
-      g1.addColorStop(0, 'rgba(155,140,255,'+v+')');
-      g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');
-      g1.addColorStop(1, 'rgba(155,140,255,0)');
-      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+    const uuids = Object.keys(manifest);
+    setStatus('Unpacking ' + uuids.length + ' assets...');
 
-      // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu
-      var ax = W*0.82, ay = H*0.12;
-      var gg = 0.10 * (1 - glow*0.45);
-      var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);
-      g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');
-      g2.addColorStop(0.45, 'rgba(233,176,74,'+(gg*0.35)+')');
-      g2.addColorStop(1, 'rgba(233,176,74,0)');
-      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+    const blobUrls = {};
+    await Promise.all(uuids.map(async (uuid) => {
+      const entry = manifest[uuid];
+      try {
+        const binaryStr = atob(entry.data);
+        const bytes = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
 
-      // ngọc lục: nở rộ khi đi sâu
-      var bx = W*0.18, by = H*0.9;
-      var tl = 0.06 + glow*0.08;
-      var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);
-      g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');
-      g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');
-      g3.addColorStop(1, 'rgba(120,235,200,0)');
-      ctx.fillStyle = g3; ctx.fillRect(0,0,W,H);
-
-      // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình
-      if(glow > 0.02){
-        var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);
-        g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.06)+')');
-        g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.02)+')');
-        g4.addColorStop(1, 'rgba(190,120,235,0)');
-        ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);
-      }
-
-      // khi xoay: tối dần ở rìa, giữ trung tâm sáng (vignette)
-      if(glow > 0.02){
-        var cv = Math.min(W,H);
-        var g5 = ctx.createRadialGradient(W*0.5, H*0.46, cv*0.18, W*0.5, H*0.46, Math.max(W,H)*0.72);
-        g5.addColorStop(0, 'rgba(7,8,15,0)');
-        g5.addColorStop(0.55, 'rgba(7,8,15,'+(glow*0.20)+')');
-        g5.addColorStop(1, 'rgba(7,8,15,'+(glow*0.55)+')');
-        ctx.fillStyle = g5; ctx.fillRect(0,0,W,H);
-      }
-    }
-
-    var t = 0;
-    function frame(){
-      t += 0.016;
-      ctx.clearRect(0,0,W,H);
-
-      // làm mượt cường độ vũ trụ theo độ sâu timeline, CHỐT về 0 khi rất nhỏ
-      var target = (typeof cosmicDepth === 'number' ? cosmicDepth : 0);
-      glow += (target - glow) * 0.06;
-      if(target === 0 && glow < 0.003) glow = 0;   // hết kéo → sao đứng yên hẳn
-
-      drawAurora();
-
-      // tâm cố định. glow = 0 → sao ĐỨNG YÊN (đốm trắng, không đuôi, không trôi).
-      // Kéo timeline đủ sâu → glow tăng → sao xoay nhanh dần, đuôi dài dần.
-      var cx = W*0.5, cy = H*0.46;
-      if(glow > 0) rot += glow * 0.0095;           // chỉ xoay khi thật sự có độ sâu
-
-      var sp = Math.min(1.7, glow * 1.9);
-      var spinning = sp > 0.04;
-      var trail = sp;
-      var segs = 4;
-
-      // sao quay quanh tâm, để lại vệt cung tròn (star-trail)
-      ctx.lineCap = 'round';
-      for(var i=0;i<stars.length;i++){
-        var s = stars[i];
-        var ang = s.ang + rot * s.spin;
-        var tw = reduce ? 1 : (0.7 + 0.3*Math.sin(t*s.tws + s.tw));
-        var bright = Math.min(1, s.base * tw * (1 + glow*0.5));
-        var lw = s.w * (1 + glow*0.25);
-        var hx = cx + Math.cos(ang)*s.radius;
-        var hy = cy + Math.sin(ang)*s.radius;
-
-        // vệt cung mờ dần về đuôi — chỉ vẽ khi đang xoay (đứng yên thì bỏ, nhẹ hơn)
-        if(spinning){
-          for(var seg=0; seg<segs; seg++){
-            var f0 = seg/segs;
-            var a1 = ang - trail*f0;
-            var a0 = ang - trail*((seg+1)/segs);
-            var taper = 1 - f0;
-            var alpha = bright * taper * taper;
-            if(alpha < 0.018) continue;
-            ctx.beginPath();
-            ctx.arc(cx, cy, s.radius, a0, a1);
-            ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';
-            ctx.lineWidth = lw;
-            ctx.stroke();
+        let finalBytes = bytes;
+        if (entry.compressed) {
+          if (typeof DecompressionStream !== 'undefined') {
+            const ds = new DecompressionStream('gzip');
+            const writer = ds.writable.getWriter();
+            const reader = ds.readable.getReader();
+            writer.write(bytes);
+            writer.close();
+            const chunks = [];
+            let totalLen = 0;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+              totalLen += value.length;
+            }
+            finalBytes = new Uint8Array(totalLen);
+            let offset = 0;
+            for (const chunk of chunks) { finalBytes.set(chunk, offset); offset += chunk.length; }
+          } else {
+            console.warn('DecompressionStream not available, asset ' + uuid + ' may not render');
           }
         }
 
-        // đầu sao sáng
-        ctx.beginPath();
-        ctx.arc(hx, hy, Math.max(0.6, lw*0.9), 0, Math.PI*2);
-        ctx.fillStyle = 'rgba('+s.col+','+bright+')';
-        ctx.fill();
-        if(s.w > 1.3 && bright > 0.45){
-          ctx.beginPath();
-          ctx.arc(hx, hy, lw*2.6, 0, Math.PI*2);
-          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12)+')';
-          ctx.fill();
-        }
+        blobUrls[uuid] = URL.createObjectURL(new Blob([finalBytes], { type: entry.mime }));
+      } catch (err) {
+        console.error('Failed to decode asset ' + uuid + ':', err);
+        blobUrls[uuid] = URL.createObjectURL(new Blob([], { type: entry.mime }));
       }
+    }));
 
-      requestAnimationFrame(frame);
+    const extResEl = document.querySelector('script[type="__bundler/ext_resources"]');
+    const extResources = extResEl ? JSON.parse(extResEl.textContent) : [];
+    const resourceMap = {};
+    for (const entry of extResources) {
+      if (blobUrls[entry.uuid]) resourceMap[entry.id] = blobUrls[entry.uuid];
     }
 
-    window.addEventListener('resize', resize);
-    resize();
-    requestAnimationFrame(frame);
-  })();
+    setStatus('Rendering...');
+    for (const uuid of uuids) template = template.split(uuid).join(blobUrls[uuid]);
 
-  /* ============ TIMELINE: ramp độ fantasy + điều hướng ============ */
-  (function(){
-    // gán --t tăng dần cho từng giai đoạn (0 → 1)
-    var steps = Array.prototype.slice.call(document.querySelectorAll('.stage'));
-    var n = steps.length;
-    steps.forEach(function(s, i){
-      var t = n > 1 ? i/(n-1) : 0;
-      s.style.setProperty('--t', t.toFixed(3));
-    });
-  })();
+    // Strip integrity + crossorigin — blob URLs from a file:// document inherit
+    // a null origin, so crossorigin forces a CORS fetch that SRI then rejects.
+    // The manifest bytes are ours; SRI protects against CDN compromise, not this.
+    template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
 
-  (function(){
-    var help = document.querySelector('.tl-help');
-    if(!help) return;
-    // không cho click nút ? mở/đóng timeline; trên cảm ứng thì bật tắt chú thích
-    help.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      help.classList.toggle('is-open');
-    });
-    help.addEventListener('keydown', function(e){
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); help.classList.toggle('is-open'); }
-      if(e.key === 'Escape'){ help.classList.remove('is-open'); }
-    });
-    document.addEventListener('click', function(e){
-      if(!help.contains(e.target)) help.classList.remove('is-open');
-    });
-  })();
+    const resourceScript = '<script>window.__resources = ' +
+      JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
+      ';</' + 'script>';
+    // Inject after <head> so the DOCTYPE stays first; prepending the script
+    // would push the parser into quirks mode. DOMParser always emits a <head>
+    // (synthesizing one if the source HTML omitted it) but may carry
+    // attributes through, so match the full opening tag. slice() rather than
+    // replace() keeps us clear of $-pattern substitution in resourceScript.
+    const headOpen = template.match(/<head[^>]*>/i);
+    if (headOpen) {
+      const i = headOpen.index + headOpen[0].length;
+      template = template.slice(0, i) + resourceScript + template.slice(i);
+    }
 
-  (function(){
-    function reveal(sel){
-      var target;
-      try{ target = document.querySelector(sel); } catch(e){ return; }
-      if(!target) return;
-      var node = target;
-      while(node){
-        if(node.tagName === 'DETAILS') node.open = true;
-        node = node.parentElement;
+    // Parse the template and swap the root element. Scripts inserted via
+    // DOMParser/replaceWith are inert per spec — re-create each with
+    // createElement so they execute, awaiting onload for src scripts to
+    // preserve ordering (React before ReactDOM before Babel before text/babel).
+    const doc = new DOMParser().parseFromString(template, 'text/html');
+    document.documentElement.replaceWith(doc.documentElement);
+    const dead = Array.from(document.scripts);
+    for (const old of dead) {
+      const s = document.createElement('script');
+      for (const a of old.attributes) s.setAttribute(a.name, a.value);
+      s.textContent = old.textContent;
+      // text/babel scripts with a src: fetch and inline. transformScriptTags
+      // does XHR against the src, but blob:null/ from a file:// origin is
+      // silently dropped. Inlining makes it a plain inline babel script,
+      // which transformScriptTags handles unconditionally.
+      if ((s.type === 'text/babel' || s.type === 'text/jsx') && s.src) {
+        const r = await fetch(s.src);
+        s.textContent = await r.text();
+        s.removeAttribute('src');
       }
-      target.scrollIntoView({ behavior:'smooth', block:'center' });
-      target.classList.remove('is-target');
-      void target.offsetWidth;
-      target.classList.add('is-target');
-      window.setTimeout(function(){ target.classList.remove('is-target'); }, 2200);
+      const p = s.src ? new Promise(function(r) { s.onload = s.onerror = r; }) : null;
+      old.replaceWith(s);
+      if (p) await p;
     }
-    window.__reveal = reveal;
-    function revealTarget(){
-      var hash = window.location.hash;
-      if(!hash || hash.length < 2) return;
-      reveal(hash);
+    // Babel standalone auto-transforms type=text/babel on DOMContentLoaded,
+    // which fired before we swapped the document. Trigger manually if present.
+    if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
+      window.Babel.transformScriptTags();
     }
-    window.addEventListener('hashchange', revealTarget);
-    window.addEventListener('load', function(){ window.setTimeout(revealTarget, 60); });
-  })();
+  } catch (err) {
+    setStatus('Error unpacking: ' + err.message);
+    console.error('Bundle unpack error:', err);
+  }
+});
 
-  /* Tích hợp timeline → thư viện: đã gộp — tải trực tiếp trên từng ô bằng nút .docx */
-
-  (function(){
-    var row  = document.querySelector('.timeline-row');
-    var prev = document.querySelector('.timeline-nav--prev');
-    var next = document.querySelector('.timeline-nav--next');
-    if(!row || !prev || !next) return;
-    function step(){
-      var card = row.querySelector('.stage');
-      var w = card ? card.getBoundingClientRect().width : 180;
-      return Math.max(160, w + 24);
-    }
-    function update(){
-      prev.disabled = row.scrollLeft <= 4;
-      next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
-      // tiến trình cuộn timeline → cường độ vũ trụ của nền
-      // dead zone 40% đầu, sau đó đường cong lũy thừa để sao chỉ xoay khi kéo đủ sâu
-      var max = row.scrollWidth - row.clientWidth;
-      var raw = max > 8 ? Math.min(1, Math.max(0, row.scrollLeft / max)) : 0;
-      var remapped = raw < 0.40 ? 0 : Math.pow((raw - 0.40) / 0.60, 1.6);
-      cosmicDepth = remapped;
-    }
-    prev.addEventListener('click', function(){ row.scrollBy({ left:-step()*2, behavior:'smooth' }); });
-    next.addEventListener('click', function(){ row.scrollBy({ left: step()*2, behavior:'smooth' }); });
-    row.addEventListener('scroll', update, { passive:true });
-    window.addEventListener('resize', update);
-    var toggle = document.querySelector('details.timeline-toggle');
-    if(toggle) toggle.addEventListener('toggle', function(){ window.setTimeout(update, 50); });
-    window.setTimeout(update, 60);
-  })();
-
-  /* ====== HÉ LỘ (nút ⋯) — ảnh minh hoạ + số chương + đoạn hé lộ + tải
-     ↓↓↓ SỬA NỘI DUNG Ở ĐÂY. Mỗi mục khớp theo đường dẫn .docx của ô.
-     - chapters: số chương, vd '12 chương'
-     - img: đường dẫn ảnh minh hoạ, vd 'illustrations/mythren-s1.png'  (để '' nếu chưa có)
-     - caption: mô tả ảnh, vd 'aurora đang hái hoa'
-     - teasers: vài đoạn hé lộ ngắn, KHÔNG tiết lộ plot — web tự đổi ngẫu nhiên
-     - (ngoại truyện có thêm series/title vì không lấy được từ ô) */
-  var PEEK = {
-    'chapters/mythren/season-1.docx': { chapters:'— chương', img:'', caption:'aurora đang hái hoa', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/season-2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/season-3.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/season-4.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/season-5.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/season-6.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/bo-trai-dat.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/liglig-s1.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/long-hoa-s1.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/long-hoa-s2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/long-hoa-s3.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/liglig-s2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/yue-qua-khu.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/yue-hien-tai.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/ngoai-truyen/fiona.docx': { series:'Ngoại truyện', title:'Fiona', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/ourera/ngoai-truyen/vanvande.docx': { series:'Ngoại truyện', title:'Vanvande', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },
-    'chapters/mythren/ngoai-truyen/lucard.docx': { series:'Ngoại truyện', title:'Quá khứ Lucard', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] }
-  };
-
-  (function(){
-    var modal = document.querySelector('.peek');
-    if(!modal) return;
-    var card    = modal.querySelector('.peek__card');
-    var imgWrap = modal.querySelector('.peek__img');
-    var img     = modal.querySelector('.peek__img img');
-    var cap     = modal.querySelector('.peek__cap');
-    var series  = modal.querySelector('.peek__series');
-    var title   = modal.querySelector('.peek__title');
-    var chs     = modal.querySelector('.peek__chapters');
-    var teaser  = modal.querySelector('.peek__teaser');
-    var reroll  = modal.querySelector('.peek__reroll');
-    var closeBtn= modal.querySelector('.peek__close');
-    var dlBtn   = modal.querySelector('.peek__dl');
-    var curTeasers = [];
-
-    function roll(){
-      var arr = (curTeasers && curTeasers.length) ? curTeasers : ['(chưa có đoạn hé lộ)'];
-      var prev = teaser.textContent;
-      var pick = arr[Math.floor(Math.random()*arr.length)];
-      var guard = 0;
-      while(arr.length > 1 && pick === prev && guard < 12){ pick = arr[Math.floor(Math.random()*arr.length)]; guard++; }
-      teaser.textContent = pick;
-    }
-    function openFor(trigger){
-      var key = trigger.getAttribute('data-peek');
-      if(!key) return;
-      var d = PEEK[key] || {};
-      card.style.setProperty('--pc', key.indexOf('/mythren/') > -1 ? 'var(--violet)' : 'var(--gold)');
-      var node = trigger.closest ? trigger.closest('.node') : null;
-      var sEl = node ? node.querySelector('.node__series') : null;
-      var tEl = node ? node.querySelector('.node__title') : null;
-      series.textContent = sEl ? sEl.textContent : (d.series || '');
-      title.textContent  = tEl ? tEl.textContent : (d.title || trigger.textContent.trim());
-      chs.textContent    = d.chapters || '— chương';
-      cap.textContent    = d.caption || '';
-      cap.style.display  = d.caption ? '' : 'none';
-      if(d.img){ img.src = d.img; imgWrap.classList.add('has-img'); }
-      else { img.removeAttribute('src'); imgWrap.classList.remove('has-img'); }
-      dlBtn.setAttribute('href', key);
-      curTeasers = d.teasers || [];
-      teaser.textContent = '';
-      roll();
-      modal.classList.add('is-open');
-      modal.setAttribute('aria-hidden','false');
-    }
-    function close(){ modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); }
-
-    document.addEventListener('click', function(e){
-      if(modal.contains(e.target)) return;
-      var trg = e.target.closest ? e.target.closest('[data-peek]') : null;
-      if(!trg){
-        var node = e.target.closest ? e.target.closest('.node') : null;
-        if(node) trg = node.querySelector('[data-peek]');
-      }
-      if(trg){ e.preventDefault(); e.stopPropagation(); openFor(trg); }
-    });
-    reroll.addEventListener('click', function(e){ e.stopPropagation(); roll(); });
-    closeBtn.addEventListener('click', close);
-    modal.addEventListener('click', function(e){ if(e.target === modal) close(); });
-    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
-  })();
   </script>
 
+  <script type="__bundler/manifest">
+{}
+  </script>
+
+  <script type="__bundler/ext_resources">
+[]
+  </script>
+
+  <script type="__bundler/template">
+"<!DOCTYPE html>\n<html lang=\"vi\"><head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Thư Viện — OurEra &amp; High and Higher<\u002Ftitle>\n\n<script>document.documentElement.classList.add('js');<\u002Fscript>\n<style>\n  :root{\n    --bg-deep:   #07080f;\n    --surface:   #14171f;\n    --surface-2: #1a1e2c40;\n    --border:    rgba(236,228,210,0.10);\n    --border-hi: rgba(233,176,74,0.42);\n\n    /* OurEra — kim sắc */\n    --gold:      #e9b04a;\n    --gold-soft: #f6d79a;\n\n    /* High and Higher — tử sắc */\n    --violet:      #9b8cff;\n    --violet-soft: #d3ccff;\n\n    --text:      #efe8d8;\n    --text-dim:  #a8a292;\n    --text-faint:#726f63;\n\n    --display: \"Times New Roman\", Times, \"Liberation Serif\", serif;\n    --body:    \"Times New Roman\", Times, serif;\n\n    --maxw: 800px;\n  }\n\n  *{ box-sizing:border-box; }\n  html,body{ margin:0; padding:0; }\n\n  body{\n    background: var(--bg-deep);\n    color: var(--text);\n    font-family: var(--body);\n    font-size: 18px;\n    line-height: 1.62;\n    -webkit-font-smoothing: antialiased;\n    text-rendering: optimizeLegibility;\n    min-height: 100vh;\n  }\n\n  /* canvas nền tương tác */\n  #cosmos{\n    position: fixed;\n    inset: 0;\n    z-index: -2;\n    pointer-events: none;\n    display: block;\n  }\n  /* lớp phủ tối nhẹ để chữ luôn rõ */\n  .veil{\n    position: fixed;\n    inset: 0;\n    z-index: -1;\n    pointer-events: none;\n    background: radial-gradient(120% 90% at 50% 0%, transparent 40%, rgba(7,8,15,0.55) 100%);\n  }\n\n  .wrap{\n    position: relative;\n    max-width: var(--maxw);\n    margin: 0 auto;\n    padding: 0 26px;\n  }\n\n  /* ---------------- HERO ---------------- */\n  .hero{\n    padding: 108px 0 44px;\n    text-align: center;\n  }\n  .hero__kicker{\n    font-size: 13px;\n    letter-spacing: 0.46em;\n    text-transform: uppercase;\n    color: var(--text-faint);\n    margin: 0 0 22px;\n    font-style: italic;\n  }\n  .hero__kicker span{ color: var(--gold); font-style: normal; }\n  .hero__kicker em{ font-style: normal; color: var(--violet); }\n  .hero__title{\n    font-family: var(--display);\n    font-weight: 700;\n    font-size: clamp(54px, 13vw, 104px);\n    line-height: 1.02;\n    letter-spacing: 0.02em;\n    margin: 0;\n    color: var(--text);\n    text-shadow: 0 0 40px rgba(233,176,74,0.20), 0 0 80px rgba(155,140,255,0.12);\n  }\n\n  .ornament{\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 16px;\n    margin: 38px auto 0;\n    max-width: 280px;\n  }\n  .ornament__line{\n    flex: 1; height: 1px;\n    background: linear-gradient(90deg, transparent, var(--border-hi));\n  }\n  .ornament__line--right{ background: linear-gradient(90deg, var(--border-hi), transparent); }\n  .ornament__gem{\n    width: 9px; height: 9px; flex: none;\n    background: linear-gradient(135deg, var(--gold), var(--violet));\n    transform: rotate(45deg);\n    border-radius: 2px;\n    box-shadow: 0 0 14px rgba(233,176,74,0.4);\n  }\n\n  /* ===== Màn mở đầu: tiêu đề hiện ra mượt khi vào trang ===== */\n  @media (prefers-reduced-motion: no-preference){\n    .hero__kicker{ animation: heroFade 1s ease both 0.2s; }\n    .hero__title{ animation: heroTitle 1.35s cubic-bezier(.2,.7,.2,1) both 0.42s; }\n    .ornament{ animation: heroFade 1.1s ease both 0.95s; }\n    .veil{ animation: veilFade 1.6s ease both; }\n    @keyframes heroFade{\n      from{ opacity: 0; transform: translateY(12px); }\n      to{ opacity: 1; transform: translateY(0); }\n    }\n    @keyframes heroTitle{\n      0%{ opacity: 0; transform: translateY(30px) scale(.95); filter: blur(12px); letter-spacing: 0.2em; }\n      55%{ filter: blur(0); }\n      100%{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); letter-spacing: 0.02em; }\n    }\n    @keyframes veilFade{ from{ opacity: 0; } to{ opacity: 1; } }\n  }\n\n  summary{ cursor: pointer; list-style: none; user-select: none; }\n  summary::-webkit-details-marker{ display:none; }\n  .summary__chevron{\n    flex: none; width: 22px; height: 22px;\n    color: var(--text-faint);\n    transition: transform .3s ease;\n  }\n  details[open] > summary .summary__chevron{ transform: rotate(90deg); }\n\n  /* ---------------- TIMELINE ---------------- */\n  details.timeline-toggle{\n    position: relative;\n    z-index: 1;\n    background: linear-gradient(180deg, rgba(20,23,31,0.72), rgba(26,30,44,0.28));\n    border: 1px solid var(--border);\n    border-radius: 18px;\n    margin: 54px 0 22px;\n    backdrop-filter: blur(6px);\n    transition: border-color .3s ease;\n  }\n  details.timeline-toggle[open]{ border-color: var(--border-hi); }\n  /* khi bật chú thích ? → nâng khung lên trên thẻ thư viện */\n  details.timeline-toggle:has(.tl-help:hover),\n  details.timeline-toggle:has(.tl-help.is-open),\n  details.timeline-toggle:has(.tl-help:focus-within){ z-index: 50; }\n\n  .timeline-toggle__summary{\n    display: flex; align-items: center; justify-content: space-between;\n    gap: 12px; padding: 24px 26px;\n    transition: color .25s ease;\n  }\n  .timeline-toggle__summary:hover{ color: var(--gold); }\n  .summary__right{ display: flex; align-items: center; gap: 14px; flex: none; }\n  .tl-help__pop strong{ color: var(--gold-soft); font-weight: 700; }\n  .timeline-toggle__eyebrow{\n    font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;\n    color: var(--gold); margin: 0 0 6px; font-style: italic;\n  }\n  .timeline-toggle__title{\n    font-family: var(--display); font-weight: 700;\n    font-size: clamp(24px, 5vw, 32px);\n    margin: 0 0 5px; letter-spacing: 0.01em; color: var(--text);\n  }\n  .timeline-toggle__desc{ font-size: 15px; color: var(--text-faint); margin: 0; font-style: italic; }\n\n  .timeline-viewport{ position: relative; display:flex; align-items:center; gap:6px; padding:0 8px; }\n\n  /* dải nền chuyển sắc: dịu → cosmic */\n  .timeline-track{\n    position: absolute;\n    left: 58px; right: 58px;\n    top: 50%;\n    height: 2px;\n    transform: translateY(-50%);\n    background: linear-gradient(90deg,\n      rgba(168,162,146,0.22) 0%,\n      rgba(233,176,74,0.30) 38%,\n      rgba(155,140,255,0.55) 72%,\n      rgba(207,200,255,0.85) 100%);\n    z-index: 0;\n    border-radius: 999px;\n    pointer-events: none;\n  }\n\n  .timeline-row{\n    position: relative;\n    z-index: 1;\n    order: 1;\n    flex: 1 1 auto;\n    min-width: 0;\n    display: flex; align-items: stretch; gap: 0;\n    padding: 8px 6px 30px;\n    overflow-x: auto;\n    overflow-y: hidden;\n    border-radius: 0 0 18px 18px;\n    -webkit-overflow-scrolling: touch;\n    scroll-behavior: smooth;\n    scroll-snap-type: x mandatory;\n    scrollbar-color: var(--border-hi) transparent;\n    scrollbar-width: thin;\n  }\n  .timeline-row::-webkit-scrollbar{ height: 12px; }\n  .timeline-row::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); border-radius:999px; margin:0 24px; }\n  .timeline-row::-webkit-scrollbar-thumb{\n    background: linear-gradient(90deg, var(--gold), var(--violet));\n    border-radius:999px; border:3px solid transparent; background-clip: padding-box;\n  }\n\n  .timeline-nav{\n    position: relative;\n    flex: none;\n    width: 42px; height: 42px;\n    display: flex; align-items:center; justify-content:center;\n    border: 1px solid var(--border-hi); border-radius: 999px;\n    background: rgba(7,8,15,0.94); color: var(--text);\n    cursor: pointer; z-index: 3;\n    transition: background-color .2s ease, transform .2s ease, opacity .2s ease;\n    box-shadow: 0 6px 18px -8px rgba(0,0,0,0.6);\n  }\n  .timeline-nav:hover{ background: var(--gold); color: var(--bg-deep); transform: scale(1.06); }\n  .timeline-nav[disabled]{ opacity: 0.25; pointer-events: none; }\n  .timeline-nav--prev{ order: 0; }\n  .timeline-nav--next{ order: 2; }\n  .timeline-nav svg{ width: 18px; height: 18px; }\n\n  /* ===== HÀNH TRÌNH 2 TUYẾN (Mythren ‖ Trái Đất) — fantasy tăng dần theo --t ===== */\n  .stage{\n    --t: 0;\n    --top-color: var(--violet);\n    --bot-color: var(--gold);\n    position: relative;\n    flex: none;\n    scroll-snap-align: start;\n    display: flex; flex-direction: column;\n    min-width: 226px;\n    padding: 6px 0 4px;\n  }\n  .stage--wide{ min-width: 320px; }\n  .stage__head{\n    display: flex; align-items: baseline; gap: 9px;\n    padding: 0 16px; min-height: 3.4em;\n  }\n  .stage__num{\n    font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1; flex: none;\n    color: color-mix(in srgb, var(--violet) calc(26% + var(--t)*64%), var(--text-faint));\n    text-shadow: 0 0 calc(var(--t)*14px) color-mix(in srgb, var(--violet) calc(var(--t)*80%), transparent);\n  }\n  .stage__name{\n    font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;\n    color: var(--text-dim); line-height: 1.32; text-wrap: balance;\n  }\n  .stage__tag{\n    margin: 0 16px 2px; font-size: 11px; font-style: italic; min-height: 1.4em;\n    color: color-mix(in srgb, var(--gold) calc(var(--t)*70%), var(--text-faint));\n  }\n  .stage__tag--sync{ color: var(--violet-soft); font-style: normal; letter-spacing: 0.06em; }\n  .stage__tag--end{ color: var(--gold-soft); }\n\n  .stage__lanes{\n    position: relative;\n    display: flex; flex-direction: column; gap: 26px;\n    padding: 14px 16px 8px;\n  }\n\n  .lane{ position: relative; min-height: 78px; display: flex; gap: 8px; }\n  /* đường tuyến chạy ngang qua giữa mỗi làn (nối liền giữa các giai đoạn) */\n  .lane::before{\n    content:\"\"; position: absolute; top: 50%; left: -16px; right: -16px; height: 2px;\n    transform: translateY(-50%); z-index: 0; border-radius: 999px;\n  }\n  .lane--top::before{ background: color-mix(in srgb, var(--top-color) calc(28% + var(--t)*56%), transparent); }\n  .lane--bot::before{ background: color-mix(in srgb, var(--bot-color) calc(28% + var(--t)*56%), transparent); }\n  .lane--empty::before{ display: none; }   /* tuyến đã kết thúc → không kẻ */\n\n  .node{\n    position: relative; z-index: 1; flex: 1 1 0; min-width: 0;\n    display: flex; flex-direction: column; justify-content: center;\n    border-radius: 11px; padding: 12px 14px 13px;\n    background:\n      radial-gradient(120% 150% at 50% -20%, color-mix(in srgb, var(--lane-color) calc(var(--t)*24%), transparent), transparent 70%),\n      rgba(15,18,26, calc(0.6 + var(--t)*0.16));\n    border: 1px solid color-mix(in srgb, var(--lane-color) calc(16% + var(--t)*34%), var(--border));\n    border-left: 2px solid var(--lane-color);\n    box-shadow: 0 calc(2px + var(--t)*12px) calc(8px + var(--t)*22px) calc(-6px - var(--t)*6px)\n                color-mix(in srgb, var(--lane-color) calc(var(--t)*60%), transparent);\n    transition: transform .2s ease, box-shadow .3s ease;\n  }\n  .lane--top .node{ --lane-color: var(--top-color); }\n  .lane--bot .node{ --lane-color: var(--bot-color); }\n  .node:hover{ transform: translateY(-2px); }\n  /* nút tải .docx ngay trên ô */\n  .node__dl{\n    margin-top: 10px; align-self: flex-start;\n    display: inline-flex; align-items: center; gap: 6px;\n    font-size: 11.5px; letter-spacing: 0.03em; font-style: normal;\n    padding: 6px 12px; border-radius: 999px; text-decoration: none; white-space: nowrap;\n    color: var(--text);\n    background: color-mix(in srgb, var(--lane-color) 18%, transparent);\n    border: 1px solid color-mix(in srgb, var(--lane-color) 48%, transparent);\n    transition: background-color .18s ease, color .18s ease, transform .18s ease;\n  }\n  .node{ cursor: pointer; }\n  .node__dl:hover{ background: var(--lane-color); color: var(--bg-deep); transform: translateY(-1px); }\n  .node__dl svg{ width: 13px; height: 13px; }\n  /* nút ⋯ hé lộ trên mỗi ô */\n  .node__peek{\n    position: absolute; top: 9px; right: 10px;\n    width: 30px; height: 22px; padding: 0;\n    display: inline-flex; align-items: center; justify-content: center;\n    font-size: 16px; line-height: 1; letter-spacing: 1px;\n    color: var(--lane-color);\n    background: color-mix(in srgb, var(--lane-color) 12%, rgba(7,8,15,0.5));\n    border: 1px solid color-mix(in srgb, var(--lane-color) 36%, transparent);\n    border-radius: 999px; cursor: pointer;\n    transition: background-color .18s ease, color .18s ease, transform .18s ease;\n  }\n  .node__peek:hover{ background: var(--lane-color); color: var(--bg-deep); transform: translateY(-1px); }\n\n  /* ===== Modal hé lộ ===== */\n  .peek{\n    position: fixed; inset: 0; z-index: 120;\n    display: flex; align-items: center; justify-content: center; padding: 22px;\n    background: rgba(4,5,10,0.74); backdrop-filter: blur(6px);\n    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s;\n  }\n  .peek.is-open{ opacity: 1; visibility: visible; }\n  .peek__card{\n    --pc: var(--gold);\n    width: min(440px, 100%); max-height: 88vh; overflow: auto;\n    background: linear-gradient(180deg, rgba(20,23,31,0.99), rgba(26,30,44,0.97));\n    border: 1px solid color-mix(in srgb, var(--pc) 40%, var(--border-hi));\n    border-radius: 18px; box-shadow: 0 40px 100px -30px #000;\n    position: relative;\n    transform: translateY(16px) scale(.98); transition: transform .3s cubic-bezier(.2,.7,.2,1);\n  }\n  .peek.is-open .peek__card{ transform: none; }\n  .peek__close{\n    position: absolute; top: 12px; right: 12px; z-index: 2;\n    width: 32px; height: 32px; border-radius: 999px;\n    background: rgba(7,8,15,0.6); border: 1px solid var(--border-hi);\n    color: var(--text-dim); cursor: pointer; font-size: 15px;\n    display: flex; align-items: center; justify-content: center;\n    transition: background-color .18s ease, color .18s ease;\n  }\n  .peek__close:hover{ background: var(--pc); color: var(--bg-deep); }\n  .peek__img{\n    position: relative; width: 100%; aspect-ratio: 16 / 10;\n    border-radius: 18px 18px 0 0; overflow: hidden;\n    background: rgba(10,12,20,0.6);\n    display: flex; align-items: center; justify-content: center;\n  }\n  .peek__img img{ width: 100%; height: 100%; object-fit: cover; display: none; }\n  .peek__img.has-img img{ display: block; }\n  .peek__imgph{\n    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;\n    color: var(--text-faint);\n    border: 1px dashed var(--border-hi); border-radius: 999px; padding: 7px 16px;\n  }\n  .peek__img.has-img .peek__imgph{ display: none; }\n  .peek__body{ padding: 18px 22px 22px; }\n  .peek__cap{\n    margin: 0 0 14px; font-size: 13px; font-style: italic; color: var(--text-dim);\n    text-align: center;\n  }\n  .peek__series{\n    margin: 0 0 4px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;\n    color: var(--pc); font-style: italic;\n  }\n  .peek__title{\n    margin: 0 0 10px; font-family: var(--display); font-weight: 700; font-size: 24px;\n    color: var(--text);\n  }\n  .peek__chapters{\n    display: inline-block; margin: 0 0 16px;\n    font-size: 12.5px; color: var(--text);\n    background: color-mix(in srgb, var(--pc) 14%, transparent);\n    border: 1px solid color-mix(in srgb, var(--pc) 40%, transparent);\n    border-radius: 999px; padding: 4px 12px;\n  }\n  .peek__teaserwrap{ border-top: 1px solid var(--border); padding-top: 14px; }\n  .peek__label{\n    margin: 0 0 6px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;\n    color: var(--text-faint);\n  }\n  .peek__teaser{\n    margin: 0 0 12px; font-size: 14.5px; line-height: 1.7; font-style: italic;\n    color: var(--text-dim); border-left: 2px solid var(--pc); padding-left: 12px;\n    text-wrap: pretty;\n  }\n  .peek__reroll{\n    display: inline-flex; align-items: center; gap: 6px;\n    font-size: 12.5px; color: var(--text-dim); cursor: pointer;\n    background: transparent; border: 1px solid var(--border-hi); border-radius: 999px;\n    padding: 6px 13px; transition: border-color .18s ease, color .18s ease;\n  }\n  .peek__reroll:hover{ color: var(--text); border-color: var(--pc); }\n  .peek__dl{\n    display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;\n    padding: 11px 20px; border-radius: 999px; text-decoration: none;\n    font-size: 14px; font-weight: 600; letter-spacing: 0.01em;\n    background: var(--pc); color: var(--bg-deep);\n    border: 1px solid var(--pc);\n    transition: transform .18s ease, filter .18s ease;\n  }\n  .peek__dl:hover{ transform: translateY(-1px); filter: brightness(1.08); }\n  .peek__dl svg{ width: 15px; height: 15px; }\n  .node__series{\n    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;\n    color: var(--lane-color); margin: 0 0 4px; font-style: italic;\n  }\n  .node__title{\n    font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: 0.01em;\n    margin: 0; color: var(--text); line-height: 1.2; text-wrap: balance;\n    text-shadow: 0 0 calc(var(--t)*14px) color-mix(in srgb, var(--lane-color) calc(var(--t)*80%), transparent);\n  }\n\n  /* điểm Sync — nối dọc hai tuyến */\n  .sync{\n    position: absolute; left: 50%; top: 30px; bottom: 30px; width: 2px;\n    transform: translateX(-50%); z-index: 0;\n    background: linear-gradient(180deg, var(--top-color), var(--bot-color));\n    opacity: calc(0.45 + var(--t)*0.45);\n  }\n  .sync::before, .sync::after{\n    content:\"\"; position: absolute; left: 50%; width: 9px; height: 9px;\n    transform: translateX(-50%) rotate(45deg); border-radius: 2px;\n  }\n  .sync::before{ top: -4px; background: var(--violet-soft); box-shadow: 0 0 10px var(--violet); }\n  .sync::after{ bottom: -4px; background: var(--gold-soft); box-shadow: 0 0 10px var(--gold); }\n\n  /* ngoại truyện — có thể bỏ qua */\n  .stage__extra{ display: flex; flex-direction: column; gap: 6px; padding: 8px 16px 0; }\n  .extra{\n    display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;\n    font-size: 12px; color: var(--text-dim); font-style: italic; text-decoration: none;\n    border: 1px dashed var(--border-hi); border-radius: 999px; padding: 6px 13px;\n    background: rgba(15,18,26,0.45); cursor: pointer; font-family: inherit;\n    transition: background-color .18s ease, color .18s ease, border-color .18s ease;\n  }\n  .extra::before{ content: \"✦\"; font-size: 10px; color: var(--gold); font-style: normal; }\n  .extra:hover{ color: var(--text); border-color: var(--gold); background: rgba(233,176,74,0.08); }\n  .extra svg{ width: 12px; height: 12px; margin-left: 2px; opacity: .85; }\n\n  /* nút ? hướng dẫn */\n  .tl-help{\n    position: relative; flex: none;\n    width: 26px; height: 26px; border-radius: 999px;\n    border: 1px solid var(--border-hi); background: rgba(7,8,15,0.6);\n    color: var(--gold); font-family: var(--display); font-weight: 700; font-size: 15px;\n    display: flex; align-items: center; justify-content: center; cursor: help;\n    transition: background-color .2s ease, color .2s ease;\n  }\n  .tl-help:hover{ background: var(--gold); color: var(--bg-deep); }\n  .tl-help__pop{\n    position: absolute; top: 36px; right: -8px; width: 318px; z-index: 30;\n    background: linear-gradient(180deg, rgba(20,23,31,0.99), rgba(26,30,44,0.97));\n    border: 1px solid var(--border-hi); border-radius: 14px; padding: 16px 18px;\n    box-shadow: 0 26px 64px -22px rgba(0,0,0,0.85);\n    opacity: 0; visibility: hidden; transform: translateY(-6px);\n    transition: transform .2s ease;\n    text-align: left; cursor: default;\n  }\n  .tl-help:hover .tl-help__pop,\n  .tl-help:focus-within .tl-help__pop,\n  .tl-help.is-open .tl-help__pop{ opacity: 1; visibility: visible; transform: translateY(0); }\n  .tl-help__pop h4{ font-family: var(--display); color: var(--text); margin: 0 0 9px; font-size: 16px; font-weight: 700; }\n  .tl-help__pop p{ margin: 0 0 9px; font-size: 13px; line-height: 1.62; color: var(--text-dim); font-style: normal; }\n  .tl-help__pop p:last-child{ margin-bottom: 0; }\n  .tl-help__row{ display: flex; align-items: center; gap: 9px; margin: 7px 0; font-size: 12.5px; color: var(--text-dim); }\n  .tl-help__sw{ width: 22px; height: 3px; border-radius: 2px; flex: none; }\n  .tl-help__dot{ flex: none; }\n\n  /* ---------------- 2 THƯ VIỆN ---------------- */\n  .lib-grid{\n    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;\n    align-items: start; margin: 0 0 60px;\n  }\n  details.lib-card{\n    --accent: var(--gold); --accent-soft: var(--gold-soft);\n    position: relative;\n    background: linear-gradient(180deg, rgba(20,23,31,0.78), rgba(26,30,44,0.30));\n    border: 1px solid var(--border); border-radius: 18px;\n    overflow: hidden;\n    backdrop-filter: blur(6px);\n    transition: border-color .3s ease, box-shadow .3s ease;\n  }\n  details.lib-card[open]{\n    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-hi));\n    box-shadow: 0 20px 46px -30px var(--accent);\n  }\n  details.lib-card--mythren{ --accent: var(--violet); --accent-soft: var(--violet-soft); }\n  details.lib-card::before{\n    content:\"\"; position:absolute; top:0; left:0; right:0; height:2px;\n    background: linear-gradient(90deg, transparent, var(--accent), transparent);\n    opacity:.85;\n  }\n\n  .lib-card__summary{\n    display:flex; flex-direction:column; align-items:center; justify-content:center;\n    gap:11px; text-align:center; padding: 34px 22px 26px;\n    transition: color .25s ease;\n  }\n  .lib-card__summary:hover{ color: var(--accent); }\n  .lib-card__icon{ width:36px; height:36px; color: var(--accent); opacity:.92; }\n  .lib-card__eyebrow{\n    font-size:12px; letter-spacing:0.3em; text-transform:uppercase;\n    color: var(--accent); margin:0; font-style: italic;\n  }\n  .lib-card__title{\n    font-family: var(--display); font-weight:700;\n    font-size: clamp(26px, 5.4vw, 36px); letter-spacing:0.02em; margin:0; line-height:1.16;\n  }\n  .lib-card__tagline{\n    font-style: italic; font-size:16px; color: var(--text-dim); margin:0; max-width:30ch;\n  }\n  .lib-card__summary .summary__chevron{ margin-top:6px; color: var(--text-faint); }\n\n  .lib-card__body{\n    padding: 4px 20px 20px; border-top: 1px solid var(--border); margin: 0 20px;\n  }\n  .parts{ list-style:none; margin:0; padding:0; }\n  .part{\n    display:flex; align-items:center; flex-wrap:wrap; gap:10px 16px;\n    border-top: 1px solid var(--border); padding: 18px 6px; border-radius:12px;\n    transition: background-color .4s ease, box-shadow .4s ease;\n    scroll-margin-top: 28px;\n  }\n  .part:first-child{ border-top:none; padding-top:20px; }\n  .part__num{\n    flex:none; font-family: var(--display); font-weight:700; font-size:26px;\n    color: var(--text-faint); min-width:1.6em; text-align:center;\n  }\n  .part__main{ flex:1 1 9em; min-width:0; }\n  .part__name{\n    font-family: var(--display); font-weight:700;\n    font-size: clamp(18px, 4vw, 21px); letter-spacing:0.01em; margin:0; color: var(--text);\n    text-wrap: pretty; line-height:1.3;\n  }\n\n  .part__download{\n    flex:none; margin-left:auto; display:inline-flex; align-items:center; gap:9px;\n    font-family: var(--body); font-size:15px; font-weight:700;\n    color: var(--bg-deep); background: var(--accent, var(--gold));\n    text-decoration:none; padding:10px 18px; border-radius:999px;\n    transition: background .25s ease, transform .15s ease, box-shadow .25s ease;\n  }\n  .part__download:hover{\n    background: var(--accent-soft, var(--gold-soft));\n    box-shadow: 0 6px 18px -6px var(--accent, var(--gold));\n  }\n  .part__download:active{ transform: translateY(1px); }\n  .part__download svg{ width:15px; height:15px; }\n\n  details.lib-card.is-target{\n    animation: cardPulse 2.2s ease;\n  }\n  @keyframes cardPulse{\n    0%, 100%{ box-shadow: 0 0 0 0 transparent; }\n    18%{ box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 60%, transparent), 0 22px 60px -24px var(--accent); }\n  }\n  .part.is-target{\n    background-color: rgba(233,176,74,0.10);\n    box-shadow: inset 3px 0 0 0 var(--accent, var(--gold));\n  }\n\n  footer{\n    border-top: 1px solid var(--border);\n    padding: 40px 0 70px; text-align:center;\n    color: var(--text-faint); font-size:15px; line-height:1.85;\n  }\n  footer .footer__brand{\n    font-family: var(--display); letter-spacing:0.2em; color: var(--text-dim);\n    font-size:14px; text-transform:uppercase;\n  }\n  footer a{ color: var(--text-dim); }\n  .footer__links{\n    display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 22px;\n    flex-wrap: wrap;\n  }\n  .footer__links a{\n    width: 44px; height: 44px; border-radius: 999px;\n    display: inline-flex; align-items: center; justify-content: center;\n    border: 1px solid var(--border-hi); color: var(--text-dim);\n    background: rgba(15,18,26,0.5);\n    transition: background-color .2s ease, color .2s ease, transform .2s ease, border-color .2s ease;\n  }\n  .footer__links a:hover{\n    background: var(--gold); color: var(--bg-deep);\n    border-color: var(--gold); transform: translateY(-2px);\n  }\n  .footer__links svg{ width: 19px; height: 19px; }\n  /* Gmail dạng chữ — hiện địa chỉ để dễ đọc/copy */\n  .footer__mail{\n    width: auto !important; height: auto !important; border-radius: 999px;\n    gap: 8px; padding: 9px 16px; font-size: 14px; letter-spacing: 0.01em;\n  }\n  .footer__mail svg{ width: 16px; height: 16px; }\n\n  a:focus-visible, summary:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:3px; border-radius:6px; }\n\n  @media (prefers-reduced-motion: reduce){\n    details.timeline-toggle, details.lib-card, .stage, .node, .tl-help, .part__download, .part, .summary__chevron{ transition:none; }\n  }\n  @media (max-width:560px){ .lib-grid{ grid-template-columns:1fr; } }\n  @media (max-width:480px){\n    .hero{ padding: 76px 0 32px; }\n    .timeline-toggle__summary, .lib-card__body{ padding-left:16px; padding-right:16px; }\n    .lib-card__body{ margin:0 14px; }\n    .part{ flex-wrap:wrap; }\n    .part__download{ margin-left: calc(1.6em + 16px); }\n  }\n<\u002Fstyle>\n<\u002Fhead>\n\n<body>\n\n  <canvas id=\"cosmos\" aria-hidden=\"true\"><\u002Fcanvas>\n  <div class=\"veil\" aria-hidden=\"true\"><\u002Fdiv>\n\n  <div class=\"wrap\">\n\n    <header class=\"hero\">\n      <p class=\"hero__kicker\"><span>OurEra<\u002Fspan> &amp; <em>High and Higher<\u002Fem><\u002Fp>\n      <h1 class=\"hero__title\">Thư Viện<\u002Fh1>\n      <div class=\"ornament\" aria-hidden=\"true\">\n        <span class=\"ornament__line\"><\u002Fspan>\n        <span class=\"ornament__gem\"><\u002Fspan>\n        <span class=\"ornament__line ornament__line--right\"><\u002Fspan>\n      <\u002Fdiv>\n    <\u002Fheader>\n\n    <details class=\"timeline-toggle\">\n      <summary class=\"timeline-toggle__summary\">\n        <div>\n          <p class=\"timeline-toggle__title\">Hành Trình<\u002Fp>\n        <\u002Fdiv>\n        <div class=\"summary__right\">\n          <span class=\"tl-help\" tabindex=\"0\" role=\"button\" aria-label=\"Hướng dẫn đọc\">?<span class=\"tl-help__pop\" role=\"tooltip\">\n              <h4>Cách đọc<\u002Fh4>\n              <p>Hai tuyến chạy <strong>song song<\u002Fstrong> theo từng Giai đoạn. Trong một giai đoạn, bạn có thể đọc <strong>tự do<\u002Fstrong> thứ tự hai tuyến.<\u002Fp>\n              <p>Mỗi ô có nút <strong>Tải .docx<\u002Fstrong>; bấm <strong>⋯<\u002Fstrong> để xem ảnh minh hoạ, số chương và đoạn hé lộ.<\u002Fp>\n              <div class=\"tl-help__row\"><span class=\"tl-help__sw\" style=\"background:var(--violet)\"><\u002Fspan> Tuyến Mythren — hàng trên<\u002Fdiv>\n              <div class=\"tl-help__row\"><span class=\"tl-help__sw\" style=\"background:var(--gold)\"><\u002Fspan> Tuyến Trái Đất — hàng dưới<\u002Fdiv>\n              <p>Đến <strong>Điểm Sync<\u002Fstrong> (◆) hai tuyến giao nhau — đọc đúng thứ tự để khớp mạch truyện.<\u002Fp>\n              <div class=\"tl-help__row\"><span class=\"tl-help__dot\">✦<\u002Fspan> Ngoại truyện (viền nét đứt) <strong>có thể bỏ qua<\u002Fstrong> — bấm để tải khi rảnh.<\u002Fdiv>\n              <p>Cứ thế đọc lần lượt từ Giai đoạn 1 → 8.<\u002Fp>\n            <\u002Fspan><\u002Fspan>\n          <svg class=\"summary__chevron\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"><\u002Fpath><\u002Fsvg>\n        <\u002Fdiv>\n      <\u002Fsummary>\n      <div class=\"timeline-viewport\">\n        <span class=\"timeline-track\" aria-hidden=\"true\"><\u002Fspan>\n        <button type=\"button\" class=\"timeline-nav timeline-nav--prev\" aria-label=\"Cuộn về chặng trước\" disabled=\"\">\n          <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 6l-6 6 6 6\"><\u002Fpath><\u002Fsvg>\n        <\u002Fbutton>\n        <button type=\"button\" class=\"timeline-nav timeline-nav--next\" aria-label=\"Cuộn tới chặng kế tiếp\">\n          <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 6l6 6-6 6\"><\u002Fpath><\u002Fsvg>\n        <\u002Fbutton>\n        <div class=\"timeline-row\">\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">01<\u002Fspan><span class=\"stage__name\">Entry Point<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag\">Song song tự do<\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 1<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-1.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Bộ Trái Đất<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/bo-trai-dat.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">02<\u002Fspan><span class=\"stage__name\">Song song tự do<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag\">Song song tự do<\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 2<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-2.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Liglig · S1<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/liglig-s1.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">03<\u002Fspan><span class=\"stage__name\">Long &amp; Hoa khởi động<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag\">Song song<\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 3<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-3.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Long &amp; Hoa · S1<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/long-hoa-s1.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n            <div class=\"stage__extra\">\n              <button class=\"extra\" type=\"button\" data-peek=\"chapters/ourera/ngoai-truyen/fiona.docx\">Ngoại truyện Fiona<\u002Fbutton>\n              <button class=\"extra\" type=\"button\" data-peek=\"chapters/ourera/ngoai-truyen/vanvande.docx\">Ngoại truyện Vanvande<\u002Fbutton>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">04<\u002Fspan><span class=\"stage__name\">Điểm Sync 1<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag stage__tag--sync\">◆ Điểm Sync<\u002Fp>\n            <div class=\"stage__lanes\">\n              <span class=\"sync\" aria-hidden=\"true\"><\u002Fspan>\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 4<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-4.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Long &amp; Hoa · S2<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/long-hoa-s2.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">05<\u002Fspan><span class=\"stage__name\">Điểm Sync 2<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag stage__tag--sync\">◆ Điểm Sync<\u002Fp>\n            <div class=\"stage__lanes\">\n              <span class=\"sync\" aria-hidden=\"true\"><\u002Fspan>\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 5<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-5.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Long &amp; Hoa · S3<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/long-hoa-s3.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">06<\u002Fspan><span class=\"stage__name\">Mythren kết thúc<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag stage__tag--end\">Khép tuyến Mythren<\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top\"><div class=\"node\"><p class=\"node__series\">Mythren<\u002Fp><p class=\"node__title\">Season 6<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/mythren/season-6.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n              <div class=\"lane lane--bot lane--empty\"><\u002Fdiv>\n            <\u002Fdiv>\n            <div class=\"stage__extra\">\n              <button class=\"extra\" type=\"button\" data-peek=\"chapters/mythren/ngoai-truyen/lucard.docx\">Ngoại truyện · Quá khứ Lucard<\u002Fbutton>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage\">\n            <div class=\"stage__head\"><span class=\"stage__num\">07<\u002Fspan><span class=\"stage__name\">Liglig Season 2<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag\"><\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top lane--empty\"><\u002Fdiv>\n              <div class=\"lane lane--bot\"><div class=\"node\"><p class=\"node__series\">Trái Đất<\u002Fp><p class=\"node__title\">Liglig · S2<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/liglig-s2.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv><\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n          <div class=\"stage stage--wide\">\n            <div class=\"stage__head\"><span class=\"stage__num\">08<\u002Fspan><span class=\"stage__name\">Giải đáp<\u002Fspan><\u002Fdiv>\n            <p class=\"stage__tag stage__tag--end\">Khép lại<\u002Fp>\n            <div class=\"stage__lanes\">\n              <div class=\"lane lane--top lane--empty\"><\u002Fdiv>\n              <div class=\"lane lane--bot\">\n                <div class=\"node\"><p class=\"node__series\">Bộ Yue<\u002Fp><p class=\"node__title\">Quá khứ<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/yue-qua-khu.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv>\n                <div class=\"node\"><p class=\"node__series\">Bộ Yue<\u002Fp><p class=\"node__title\">Hiện tại<\u002Fp><button class=\"node__peek\" type=\"button\" data-peek=\"chapters/ourera/yue-hien-tai.docx\" aria-label=\"Hé lộ\">⋯<\u002Fbutton><\u002Fdiv>\n              <\u002Fdiv>\n            <\u002Fdiv>\n          <\u002Fdiv>\n\n        <\u002Fdiv>\n      <\u002Fdiv>\n    <\u002Fdetails>\n\n\n    <footer>\n      <p class=\"footer__brand\">2oKODAMI<\u002Fp>\n      <div class=\"footer__links\">\n        <a href=\"https://www.facebook.com/Tinedatt001/\" target=\"_blank\" rel=\"noopener\" aria-label=\"Facebook\" title=\"Facebook\">\n          <svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M14 13.5h2.5l1-4H14V7.5c0-1.03 0-2 2-2h1.5V2.14c-.33-.04-1.55-.14-2.84-.14C11.93 2 10 3.66 10 6.7v2.8H7v4h3V22h4z\"><\u002Fpath><\u002Fsvg>\n        <\u002Fa>\n        <a class=\"footer__mail\" href=\"mailto:tiendatvd2202@gmail.com\" aria-label=\"Gmail\" title=\"Gửi email\">\n          <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"><\u002Frect><path d=\"M3.5 6.5 12 13l8.5-6.5\"><\u002Fpath><\u002Fsvg>\n          tiendatvd2202@gmail.com\n        <\u002Fa>\n      <\u002Fdiv>\n      <p>Cảm ơn bạn đã ghé thăm hai thế giới này.<br>\n      Trang được lưu trữ miễn phí trên GitHub Pages.<\u002Fp>\n    <\u002Ffooter>\n\n    <div class=\"peek\" aria-hidden=\"true\">\n      <div class=\"peek__card\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Hé lộ\">\n        <button class=\"peek__close\" type=\"button\" aria-label=\"Đóng\">✕<\u002Fbutton>\n        <div class=\"peek__img\"><img alt=\"\"><span class=\"peek__imgph\">Ảnh minh hoạ<\u002Fspan><\u002Fdiv>\n        <div class=\"peek__body\">\n          <p class=\"peek__cap\"><\u002Fp>\n          <p class=\"peek__series\"><\u002Fp>\n          <h3 class=\"peek__title\"><\u002Fh3>\n          <p class=\"peek__chapters\"><\u002Fp>\n          <div class=\"peek__teaserwrap\">\n            <p class=\"peek__label\">Đoạn hé lộ<\u002Fp>\n            <p class=\"peek__teaser\"><\u002Fp>\n            <button class=\"peek__reroll\" type=\"button\">↻ Đoạn khác<\u002Fbutton>\n          <\u002Fdiv>\n          <a class=\"peek__dl\" href=\"#\" download=\"\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v12m0 0l-4-4m4 4l4-4M5 21h14\"><\u002Fpath><\u002Fsvg>Tải .docx<\u002Fa>\n        <\u002Fdiv>\n      <\u002Fdiv>\n    <\u002Fdiv>\n\n  <\u002Fdiv>\n\n  <script>\n  /* Cường độ vũ trụ: 0 = đầu timeline (đứng yên) → 1 = cuối timeline (xoay nhanh).\n     Cập nhật khi cuộn timeline; nền canvas đọc để quyết định tốc độ xoay & đuôi sao. */\n  var cosmicDepth = 0;\n\n  /* ============ NỀN VŨ TRỤ TƯƠNG TÁC ============ */\n  (function(){\n    var canvas = document.getElementById('cosmos');\n    if(!canvas) return;\n    var ctx = canvas.getContext('2d');\n    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;\n    var glow = 0; // bản làm mượt của cosmicDepth\n\n    var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 1.5);\n    var stars = [], rot = 0;\n\n    function resize(){\n      W = canvas.clientWidth = window.innerWidth;\n      H = canvas.clientHeight = window.innerHeight;\n      canvas.width = W * DPR; canvas.height = H * DPR;\n      ctx.setTransform(DPR,0,0,DPR,0,0);\n      build();\n    }\n\n    function build(){\n      var maxR = Math.hypot(W, H) * 0.82;\n      stars = [];\n      var count = Math.round((W*H)/3200);\n      for(var i=0;i<count;i++){\n        var radius = Math.pow(Math.random(), 0.78) * maxR;  // dồn nhẹ về tâm\n        var tint = Math.random();\n        var col = '255,255,255';\n        if(tint > 0.93) col = '245,210,138';        // đốm kim sắc\n        else if(tint > 0.85) col = '210,200,255';    // đốm tím\n        else if(tint > 0.74) col = '175,222,255';    // trắng xanh\n        stars.push({\n          radius: radius,\n          ang: Math.random()*Math.PI*2,\n          w: 0.5 + Math.random()*1.5,\n          base: 0.3 + Math.random()*0.6,\n          col: col,\n          spin: 1 + (Math.random()-0.5)*0.10,        // biến thiên nhẹ cho tự nhiên\n          tw: Math.random()*Math.PI*2,\n          tws: 0.6 + Math.random()*1.4\n        });\n      }\n    }\n\n    // aurora tĩnh — rực rỡ dần theo độ sâu timeline (glow), không đi theo con trỏ\n    function drawAurora(){\n      var ac = W*0.5, ay0 = H*0.46;\n      // cực quang tím: chính, mạnh dần theo glow\n      var v = 0.13 + glow*0.17;\n      var g1 = ctx.createRadialGradient(ac, ay0-40, 0, ac, ay0-40, Math.max(W,H)*(0.55+glow*0.2));\n      g1.addColorStop(0, 'rgba(155,140,255,'+v+')');\n      g1.addColorStop(0.4, 'rgba(155,140,255,'+(v*0.36)+')');\n      g1.addColorStop(1, 'rgba(155,140,255,0)');\n      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);\n\n      // kim sắc: dịu lúc đầu, nhường chỗ cho tím khi đi sâu\n      var ax = W*0.82, ay = H*0.12;\n      var gg = 0.10 * (1 - glow*0.45);\n      var g2 = ctx.createRadialGradient(ax, ay, 0, ax, ay, Math.max(W,H)*0.5);\n      g2.addColorStop(0, 'rgba(233,176,74,'+gg+')');\n      g2.addColorStop(0.45, 'rgba(233,176,74,'+(gg*0.35)+')');\n      g2.addColorStop(1, 'rgba(233,176,74,0)');\n      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);\n\n      // ngọc lục: nở rộ khi đi sâu\n      var bx = W*0.18, by = H*0.9;\n      var tl = 0.06 + glow*0.08;\n      var g3 = ctx.createRadialGradient(bx, by, 0, bx, by, Math.max(W,H)*0.5);\n      g3.addColorStop(0, 'rgba(120,235,200,'+tl+')');\n      g3.addColorStop(0.5, 'rgba(120,235,200,'+(tl*0.3)+')');\n      g3.addColorStop(1, 'rgba(120,235,200,0)');\n      ctx.fillStyle = g3; ctx.fillRect(0,0,W,H);\n\n      // ánh magenta sâu thẳm chỉ hiện ở cuối hành trình\n      if(glow > 0.02){\n        var g4 = ctx.createRadialGradient(W*0.5, H*0.55, 0, W*0.5, H*0.55, Math.max(W,H)*0.7);\n        g4.addColorStop(0, 'rgba(190,120,235,'+(glow*0.06)+')');\n        g4.addColorStop(0.6, 'rgba(190,120,235,'+(glow*0.02)+')');\n        g4.addColorStop(1, 'rgba(190,120,235,0)');\n        ctx.fillStyle = g4; ctx.fillRect(0,0,W,H);\n      }\n\n      // khi xoay: tối dần ở rìa, giữ trung tâm sáng (vignette)\n      if(glow > 0.02){\n        var cv = Math.min(W,H);\n        var g5 = ctx.createRadialGradient(W*0.5, H*0.46, cv*0.18, W*0.5, H*0.46, Math.max(W,H)*0.72);\n        g5.addColorStop(0, 'rgba(7,8,15,0)');\n        g5.addColorStop(0.55, 'rgba(7,8,15,'+(glow*0.20)+')');\n        g5.addColorStop(1, 'rgba(7,8,15,'+(glow*0.55)+')');\n        ctx.fillStyle = g5; ctx.fillRect(0,0,W,H);\n      }\n    }\n\n    var t = 0;\n    function frame(){\n      t += 0.016;\n      ctx.clearRect(0,0,W,H);\n\n      // làm mượt cường độ vũ trụ theo độ sâu timeline, CHỐT về 0 khi rất nhỏ\n      var target = (typeof cosmicDepth === 'number' ? cosmicDepth : 0);\n      glow += (target - glow) * 0.06;\n      if(target === 0 && glow < 0.003) glow = 0;   // hết kéo → sao đứng yên hẳn\n\n      drawAurora();\n\n      // tâm cố định. glow = 0 → sao ĐỨNG YÊN (đốm trắng, không đuôi, không trôi).\n      // Kéo timeline đủ sâu → glow tăng → sao xoay nhanh dần, đuôi dài dần.\n      var cx = W*0.5, cy = H*0.46;\n      if(glow > 0) rot += glow * 0.0095;           // chỉ xoay khi thật sự có độ sâu\n\n      var sp = Math.min(1.7, glow * 1.9);\n      var spinning = sp > 0.04;\n      var trail = sp;\n      var segs = 4;\n\n      // sao quay quanh tâm, để lại vệt cung tròn (star-trail)\n      ctx.lineCap = 'round';\n      for(var i=0;i<stars.length;i++){\n        var s = stars[i];\n        var ang = s.ang + rot * s.spin;\n        var tw = reduce ? 1 : (0.7 + 0.3*Math.sin(t*s.tws + s.tw));\n        var bright = Math.min(1, s.base * tw * (1 + glow*0.5));\n        var lw = s.w * (1 + glow*0.25);\n        var hx = cx + Math.cos(ang)*s.radius;\n        var hy = cy + Math.sin(ang)*s.radius;\n\n        // vệt cung mờ dần về đuôi — chỉ vẽ khi đang xoay (đứng yên thì bỏ, nhẹ hơn)\n        if(spinning){\n          for(var seg=0; seg<segs; seg++){\n            var f0 = seg/segs;\n            var a1 = ang - trail*f0;\n            var a0 = ang - trail*((seg+1)/segs);\n            var taper = 1 - f0;\n            var alpha = bright * taper * taper;\n            if(alpha < 0.018) continue;\n            ctx.beginPath();\n            ctx.arc(cx, cy, s.radius, a0, a1);\n            ctx.strokeStyle = 'rgba('+s.col+','+alpha+')';\n            ctx.lineWidth = lw;\n            ctx.stroke();\n          }\n        }\n\n        // đầu sao sáng\n        ctx.beginPath();\n        ctx.arc(hx, hy, Math.max(0.6, lw*0.9), 0, Math.PI*2);\n        ctx.fillStyle = 'rgba('+s.col+','+bright+')';\n        ctx.fill();\n        if(s.w > 1.3 && bright > 0.45){\n          ctx.beginPath();\n          ctx.arc(hx, hy, lw*2.6, 0, Math.PI*2);\n          ctx.fillStyle = 'rgba('+s.col+','+(bright*0.12)+')';\n          ctx.fill();\n        }\n      }\n\n      requestAnimationFrame(frame);\n    }\n\n    window.addEventListener('resize', resize);\n    resize();\n    requestAnimationFrame(frame);\n  })();\n\n  /* ============ TIMELINE: ramp độ fantasy + điều hướng ============ */\n  (function(){\n    // gán --t tăng dần cho từng giai đoạn (0 → 1)\n    var steps = Array.prototype.slice.call(document.querySelectorAll('.stage'));\n    var n = steps.length;\n    steps.forEach(function(s, i){\n      var t = n > 1 ? i/(n-1) : 0;\n      s.style.setProperty('--t', t.toFixed(3));\n    });\n  })();\n\n  (function(){\n    var help = document.querySelector('.tl-help');\n    if(!help) return;\n    // không cho click nút ? mở/đóng timeline; trên cảm ứng thì bật tắt chú thích\n    help.addEventListener('click', function(e){\n      e.preventDefault();\n      e.stopPropagation();\n      help.classList.toggle('is-open');\n    });\n    help.addEventListener('keydown', function(e){\n      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); help.classList.toggle('is-open'); }\n      if(e.key === 'Escape'){ help.classList.remove('is-open'); }\n    });\n    document.addEventListener('click', function(e){\n      if(!help.contains(e.target)) help.classList.remove('is-open');\n    });\n  })();\n\n  (function(){\n    function reveal(sel){\n      var target;\n      try{ target = document.querySelector(sel); } catch(e){ return; }\n      if(!target) return;\n      var node = target;\n      while(node){\n        if(node.tagName === 'DETAILS') node.open = true;\n        node = node.parentElement;\n      }\n      target.scrollIntoView({ behavior:'smooth', block:'center' });\n      target.classList.remove('is-target');\n      void target.offsetWidth;\n      target.classList.add('is-target');\n      window.setTimeout(function(){ target.classList.remove('is-target'); }, 2200);\n    }\n    window.__reveal = reveal;\n    function revealTarget(){\n      var hash = window.location.hash;\n      if(!hash || hash.length < 2) return;\n      reveal(hash);\n    }\n    window.addEventListener('hashchange', revealTarget);\n    window.addEventListener('load', function(){ window.setTimeout(revealTarget, 60); });\n  })();\n\n  /* Tích hợp timeline → thư viện: đã gộp — tải trực tiếp trên từng ô bằng nút .docx */\n\n  (function(){\n    var row  = document.querySelector('.timeline-row');\n    var prev = document.querySelector('.timeline-nav--prev');\n    var next = document.querySelector('.timeline-nav--next');\n    if(!row || !prev || !next) return;\n    function step(){\n      var card = row.querySelector('.stage');\n      var w = card ? card.getBoundingClientRect().width : 180;\n      return Math.max(160, w + 24);\n    }\n    function update(){\n      prev.disabled = row.scrollLeft <= 4;\n      next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;\n      // tiến trình cuộn timeline → cường độ vũ trụ của nền\n      // dead zone 40% đầu, sau đó đường cong lũy thừa để sao chỉ xoay khi kéo đủ sâu\n      var max = row.scrollWidth - row.clientWidth;\n      var raw = max > 8 ? Math.min(1, Math.max(0, row.scrollLeft / max)) : 0;\n      var remapped = raw < 0.40 ? 0 : Math.pow((raw - 0.40) / 0.60, 1.6);\n      cosmicDepth = remapped;\n    }\n    prev.addEventListener('click', function(){ row.scrollBy({ left:-step()*2, behavior:'smooth' }); });\n    next.addEventListener('click', function(){ row.scrollBy({ left: step()*2, behavior:'smooth' }); });\n    row.addEventListener('scroll', update, { passive:true });\n    window.addEventListener('resize', update);\n    var toggle = document.querySelector('details.timeline-toggle');\n    if(toggle) toggle.addEventListener('toggle', function(){ window.setTimeout(update, 50); });\n    window.setTimeout(update, 60);\n  })();\n\n  /* ====== HÉ LỘ (nút ⋯) — ảnh minh hoạ + số chương + đoạn hé lộ + tải\n     ↓↓↓ SỬA NỘI DUNG Ở ĐÂY. Mỗi mục khớp theo đường dẫn .docx của ô.\n     - chapters: số chương, vd '12 chương'\n     - img: đường dẫn ảnh minh hoạ, vd 'illustrations/mythren-s1.png'  (để '' nếu chưa có)\n     - caption: mô tả ảnh, vd 'aurora đang hái hoa'\n     - teasers: vài đoạn hé lộ ngắn, KHÔNG tiết lộ plot — web tự đổi ngẫu nhiên\n     - (ngoại truyện có thêm series/title vì không lấy được từ ô) */\n  var PEEK = {\n    'chapters/mythren/season-1.docx': { chapters:'— chương', img:'', caption:'aurora đang hái hoa', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/season-2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/season-3.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/season-4.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/season-5.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/season-6.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/bo-trai-dat.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/liglig-s1.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/long-hoa-s1.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/long-hoa-s2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/long-hoa-s3.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/liglig-s2.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/yue-qua-khu.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/yue-hien-tai.docx': { chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/ngoai-truyen/fiona.docx': { series:'Ngoại truyện', title:'Fiona', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/ourera/ngoai-truyen/vanvande.docx': { series:'Ngoại truyện', title:'Vanvande', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] },\n    'chapters/mythren/ngoai-truyen/lucard.docx': { series:'Ngoại truyện', title:'Quá khứ Lucard', chapters:'— chương', img:'', caption:'(mô tả ảnh)', teasers:['(đoạn hé lộ 1 — điền sau)','(đoạn hé lộ 2 — điền sau)'] }\n  };\n\n  (function(){\n    var modal = document.querySelector('.peek');\n    if(!modal) return;\n    var card    = modal.querySelector('.peek__card');\n    var imgWrap = modal.querySelector('.peek__img');\n    var img     = modal.querySelector('.peek__img img');\n    var cap     = modal.querySelector('.peek__cap');\n    var series  = modal.querySelector('.peek__series');\n    var title   = modal.querySelector('.peek__title');\n    var chs     = modal.querySelector('.peek__chapters');\n    var teaser  = modal.querySelector('.peek__teaser');\n    var reroll  = modal.querySelector('.peek__reroll');\n    var closeBtn= modal.querySelector('.peek__close');\n    var dlBtn   = modal.querySelector('.peek__dl');\n    var curTeasers = [];\n\n    function roll(){\n      var arr = (curTeasers && curTeasers.length) ? curTeasers : ['(chưa có đoạn hé lộ)'];\n      var prev = teaser.textContent;\n      var pick = arr[Math.floor(Math.random()*arr.length)];\n      var guard = 0;\n      while(arr.length > 1 && pick === prev && guard < 12){ pick = arr[Math.floor(Math.random()*arr.length)]; guard++; }\n      teaser.textContent = pick;\n    }\n    function openFor(trigger){\n      var key = trigger.getAttribute('data-peek');\n      if(!key) return;\n      var d = PEEK[key] || {};\n      card.style.setProperty('--pc', key.indexOf('/mythren/') > -1 ? 'var(--violet)' : 'var(--gold)');\n      var node = trigger.closest ? trigger.closest('.node') : null;\n      var sEl = node ? node.querySelector('.node__series') : null;\n      var tEl = node ? node.querySelector('.node__title') : null;\n      series.textContent = sEl ? sEl.textContent : (d.series || '');\n      title.textContent  = tEl ? tEl.textContent : (d.title || trigger.textContent.trim());\n      chs.textContent    = d.chapters || '— chương';\n      cap.textContent    = d.caption || '';\n      cap.style.display  = d.caption ? '' : 'none';\n      if(d.img){ img.src = d.img; imgWrap.classList.add('has-img'); }\n      else { img.removeAttribute('src'); imgWrap.classList.remove('has-img'); }\n      dlBtn.setAttribute('href', key);\n      curTeasers = d.teasers || [];\n      teaser.textContent = '';\n      roll();\n      modal.classList.add('is-open');\n      modal.setAttribute('aria-hidden','false');\n    }\n    function close(){ modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); }\n\n    document.addEventListener('click', function(e){\n      if(modal.contains(e.target)) return;\n      var trg = e.target.closest ? e.target.closest('[data-peek]') : null;\n      if(!trg){\n        var node = e.target.closest ? e.target.closest('.node') : null;\n        if(node) trg = node.querySelector('[data-peek]');\n      }\n      if(trg){ e.preventDefault(); e.stopPropagation(); openFor(trg); }\n    });\n    reroll.addEventListener('click', function(e){ e.stopPropagation(); roll(); });\n    closeBtn.addEventListener('click', close);\n    modal.addEventListener('click', function(e){ if(e.target === modal) close(); });\n    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });\n  })();\n  <\u002Fscript>\n\n\n\n<\u002Fbody><\u002Fhtml>"
+  </script>
 </body>
 </html>
